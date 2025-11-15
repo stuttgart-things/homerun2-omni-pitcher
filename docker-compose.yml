@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  homerun2-omni-pitcher:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - REDIS_ADDR=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=
+      - REDIS_STREAM=messages
+    depends_on:
+      redis:
+        condition: service_healthy
+
+volumes:
+  redis-data:

@@ -2,6 +2,8 @@ module github.com/stuttgart-things/homerun2-omni-pitcher
 
 go 1.24.10
 
+require github.com/stuttgart-things/homerun-library v1.2.1-0.20251113075110-883768414c9f
+
 require (
 	atomicgo.dev/cursor v0.2.0 // indirect
 	atomicgo.dev/keyboard v0.2.9 // indirect
@@ -161,7 +163,6 @@ require (
 	github.com/spf13/cast v1.6.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.19.0 // indirect
-	github.com/stuttgart-things/homerun-library v1.2.1-0.20251113075110-883768414c9f // indirect
 	github.com/stuttgart-things/redisqueue v0.0.0-20230628084515-1d31f7874df7 // indirect
 	github.com/stuttgart-things/sthingsBase v0.1.41 // indirect
 	github.com/stuttgart-things/sthingsCli v0.3.0 // indirect

@@ -102,6 +102,18 @@ Response:
 
 ## Docker
 
+### Using docker-compose (recommended)
+
+The easiest way to run the service with Redis:
+
+```bash
+docker-compose up
+```
+
+This will start both Redis and the homerun2-omni-pitcher service.
+
+### Building and running manually
+
 ```bash
 docker build -t homerun2-omni-pitcher .
 docker run -p 8080:8080 \
@@ -115,6 +127,20 @@ docker run -p 8080:8080 \
 
 - `GET /health` - Health check endpoint
 - `POST /pitch` - Submit a message to Redis Streams
+
+## Examples
+
+A test script is provided in `examples/test-api.sh` to demonstrate API usage:
+
+```bash
+# Start the service first (with docker-compose or directly)
+docker-compose up -d
+
+# Run the test script
+./examples/test-api.sh
+```
+
+The script tests various scenarios including validation errors and successful message submissions.
 
 ## License
 
