@@ -100,29 +100,6 @@ Response:
 | `artifacts` | No | Related artifacts (e.g., container image) | - |
 | `url` | No | Related URL | - |
 
-## Docker
-
-### Using docker-compose (recommended)
-
-The easiest way to run the service with Redis:
-
-```bash
-docker-compose up
-```
-
-This will start both Redis and the homerun2-omni-pitcher service.
-
-### Building and running manually
-
-```bash
-docker build -t homerun2-omni-pitcher .
-docker run -p 8080:8080 \
-  -e REDIS_ADDR=redis \
-  -e REDIS_PORT=6379 \
-  -e REDIS_STREAM=messages \
-  homerun2-omni-pitcher
-```
-
 ## API Endpoints
 
 - `GET /health` - Health check endpoint
@@ -133,8 +110,8 @@ docker run -p 8080:8080 \
 A test script is provided in `examples/test-api.sh` to demonstrate API usage:
 
 ```bash
-# Start the service first (with docker-compose or directly)
-docker-compose up -d
+# Start the service first
+./homerun2-omni-pitcher &
 
 # Run the test script
 ./examples/test-api.sh
