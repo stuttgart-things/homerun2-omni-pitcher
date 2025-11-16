@@ -3,18 +3,44 @@ version: 3
 includes:
   git:
     taskfile: https://raw.githubusercontent.com/stuttgart-things/platform-engineering-showcase/refs/heads/main/taskfiles/git.yaml
+  go:
+    taskfile: https://raw.githubusercontent.com/stuttgart-things/platform-engineering-showcase/refs/heads/main/taskfiles/go-microservice.yaml
 
-  # default:
-  #   desc: Default task is select & do (work)
-  #   cmds:
-  #     - task do
+vars:
+  PROJECT_NAME:
+    sh: echo ${PWD##*/}
+  ORGA_NAME: stuttgart-things
+  MODULE: github.com/{{ .ORGA_NAME }}/{{ .PROJECT_NAME }}
 
-  # do:
-  #   desc: Select a task to run
-  #   cmds:
-  #     - |
-  #       # Extract task names (keep internal colons, remove only trailing colon)
-  #       task_name=$(task -l | awk '/^\*/ {print $2}' | sed 's/:$//' | gum choose)
+tasks:
+  default:
+    desc: Default task is select & do (work)
+    cmds:
+      - task do
 
-  #       # Run the selected task
-  #       [ -n "$task_name" ] && task "$task_name"
+  do:
+    desc: Select a task to run
+    cmds:
+      - |
+        # Extract task names (keep internal colons, remove only trailing colon)
+        task_name=$(task -l | awk '/^\*/ {print $2}' | sed 's/:$//' | gum choose)
+
+        # Run the selected task
+        [ -n "$task_name" ] && task "$task_name"
+
+  ci-run-static-checks:
+    cmds:
+      - |
+        dagger call -m {{ .CI_MODULE }} {{ .FUNCTION }} \
+        --src {{ .SRC }} \
+        --lintCanFail=true \
+        --go-Version=1.25.4 \
+        --test={{ .TEST }} \
+        --progress plain -vv \
+        export --path={{ .REPORT_PATH }}
+        cat {{ .REPORT_PATH }}
+    vars:
+      SRC: .
+      TEST: true
+      FUNCTION: run-static-stage
+      REPORT_PATH: /tmp/{{ .PROJECT_NAME }}-static-analysis-report.json
