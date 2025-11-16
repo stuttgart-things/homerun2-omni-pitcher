@@ -122,4 +122,3 @@ The script tests various scenarios including validation errors and successful me
 ## License
 
 See [LICENSE](LICENSE) file.
-

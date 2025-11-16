@@ -1,0 +1,20 @@
+---
+version: 3
+includes:
+  git:
+    taskfile: https://raw.githubusercontent.com/stuttgart-things/platform-engineering-showcase/refs/heads/main/taskfiles/git.yaml
+
+  # default:
+  #   desc: Default task is select & do (work)
+  #   cmds:
+  #     - task do
+
+  # do:
+  #   desc: Select a task to run
+  #   cmds:
+  #     - |
+  #       # Extract task names (keep internal colons, remove only trailing colon)
+  #       task_name=$(task -l | awk '/^\*/ {print $2}' | sed 's/:$//' | gum choose)
+
+  #       # Run the selected task
+  #       [ -n "$task_name" ] && task "$task_name"
