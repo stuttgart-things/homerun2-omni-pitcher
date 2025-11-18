@@ -1,0 +1,15 @@
+{
+  "name": "dagger",
+  "engineVersion": "v0.19.6",
+  "sdk": {
+    "source": "go"
+  },
+  "dependencies": [
+    {
+      "name": "homerun",
+      "source": "github.com/stuttgart-things/dagger/homerun@v0.42.0",
+      "pin": "0d3c8e57dde6e4527287b81f28ce6e920768499a"
+    }
+  ],
+  "source": "dagger"
+}
