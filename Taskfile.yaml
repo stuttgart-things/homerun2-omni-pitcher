@@ -5,7 +5,6 @@ includes:
     taskfile: https://raw.githubusercontent.com/stuttgart-things/platform-engineering-showcase/refs/heads/main/taskfiles/git.yaml
   go:
     taskfile: https://raw.githubusercontent.com/stuttgart-things/platform-engineering-showcase/refs/heads/main/taskfiles/go-microservice.yaml
-
 vars:
   PROJECT_NAME:
     sh: echo ${PWD##*/}
@@ -13,6 +12,23 @@ vars:
   MODULE: github.com/{{ .ORGA_NAME }}/{{ .PROJECT_NAME }}
 
 tasks:
+  run-lint-and-build:
+    desc: Run lint and build stages sequentially for {{ .PROJECT_NAME }}
+    cmds:
+      - task: run-lint-stage
+      - task: run-build-stage
+
+  run-lint-stage:
+    desc: Run linting stage for {{ .PROJECT_NAME }} using Dagger CI
+    cmds:
+      - task: go:run-lint-stage
+        vars:
+          SRC: ./
+          TEST: "true"
+          GO_VERSION: "1.25.4"
+          LINT_CAN_FAIL: "true"
+          REPORT_PATH: /tmp/{{ .PROJECT_NAME }}/ci/lint.txt
+
   run-build-stage:
     desc: Build {{ .PROJECT_NAME }} binary using Go and Ko using Dagger CI
     cmds:
@@ -24,19 +40,21 @@ tasks:
           KO_BUILD: "true"
           KO_PUSH: "false"
           KO_REPO: ghcr.io/{{ .ORGA_NAME }}/{{ .PROJECT_NAME }}
-          EXPORT_PATH: /tmp/{{ .PROJECT_NAME}}/build/
+          EXPORT_PATH: /tmp/{{ .PROJECT_NAME}}/ci/build.txt
 
-  run-lint-stage:
-    desc: Run linting stage for {{ .PROJECT_NAME }} using Dagger CI
+  build-and-test-binary:
+    desc: Build and test binary via Dagger CI
+    vars:
+      SRC: ./
+      FUNCTION: build-and-test-binary
+      EXPORT_PATH: /tmp/{{ .PROJECT_NAME}}/ci/build-test.txt
     cmds:
-      - task: go:run-lint-stage
-        vars:
-          SRC: ./
-          TEST: "true"
-          GO_VERSION: "1.25.4"
-          LINT_CAN_FAIL: "true"
-          REPORT_PATH: /tmp/{{ .PROJECT_NAME }}/lint/
-
+      - |
+        dagger call -m dagger \
+        build-and-test-binary \
+        --source "{{ .SRC }}" \
+        export --path={{ .EXPORT_PATH }} \
+        --progress plain -vv
 
   default:
     desc: Default task is select & do (work)
@@ -52,8 +70,6 @@ tasks:
 
         # Run the selected task
         [ -n "$task_name" ] && task "$task_name"
-
-
 
   run-go-tests:
     desc: Run Go tests via Dagger CI

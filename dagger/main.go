@@ -22,7 +22,7 @@ import (
 
 type Dagger struct{}
 
-func (m *Dagger) BuildBin(
+func (m *Dagger) BuildAndTestBinary(
 	ctx context.Context,
 	source *dagger.Directory,
 	// +optional
@@ -142,102 +142,102 @@ exit 0
 	return testLog, nil
 }
 
-func (m *Dagger) BuildAndTestBinary(
-	ctx context.Context,
-	source *dagger.Directory,
-	// +optional
-	// +default="1.25.4"
-	goVersion string,
-	buildPath string,
-	testPath string,
-	// +optional
-	// +default="linux"
-	os string,
-	// +optional
-	// +default="amd64"
-	arch string,
-	// +optional
-	// +default="main"
-	binName string,
-	// +optional
-	// +default=""
-	ldflags string,
-	// +optional
-	// +default="GITHUB_TOKEN"
-	tokenName string,
-	// +optional
-	// +default=""
-	packageName string,
-	// +optional
-	token *dagger.Secret,
-	// +optional
-	// +default="ko.local"
-	koRepo string,
-	// +optional
-	// +default="v0.18.0"
-	koVersion string,
-	// +optional
-	// +default="."
-	koBuildArg string,
-	// +optional
-	// +default="false"
-	koPush string,
-	// +optional
-	// +default=true
-	buildBinary bool,
-	// +optional
-	// +default=true
-	koBuild bool,
-	// +optional
-	// +default="build-report.txt"
-	reportName string) (string, error) {
+// func (m *Dagger) BuildAndTestBinary(
+// 	ctx context.Context,
+// 	source *dagger.Directory,
+// 	// +optional
+// 	// +default="1.25.4"
+// 	goVersion string,
+// 	buildPath string,
+// 	testPath string,
+// 	// +optional
+// 	// +default="linux"
+// 	os string,
+// 	// +optional
+// 	// +default="amd64"
+// 	arch string,
+// 	// +optional
+// 	// +default="main"
+// 	binName string,
+// 	// +optional
+// 	// +default=""
+// 	ldflags string,
+// 	// +optional
+// 	// +default="GITHUB_TOKEN"
+// 	tokenName string,
+// 	// +optional
+// 	// +default=""
+// 	packageName string,
+// 	// +optional
+// 	token *dagger.Secret,
+// 	// +optional
+// 	// +default="ko.local"
+// 	koRepo string,
+// 	// +optional
+// 	// +default="v0.18.0"
+// 	koVersion string,
+// 	// +optional
+// 	// +default="."
+// 	koBuildArg string,
+// 	// +optional
+// 	// +default="false"
+// 	koPush string,
+// 	// +optional
+// 	// +default=true
+// 	buildBinary bool,
+// 	// +optional
+// 	// +default=true
+// 	koBuild bool,
+// 	// +optional
+// 	// +default="build-report.txt"
+// 	reportName string) (string, error) {
 
-	buildDir := dag.GoMicroservice().RunBuildStage(
-		source,
-		dagger.GoMicroserviceRunBuildStageOpts{
-			GoVersion:   goVersion,
-			Os:          os,
-			Arch:        arch,
-			GoMainFile:  buildPath,
-			BinName:     binName,
-			Ldflags:     ldflags,
-			TokenName:   tokenName,
-			PackageName: packageName,
-			Token:       token,
-			KoRepo:      koRepo,
-			KoVersion:   koVersion,
-			KoBuildArg:  koBuildArg,
-			KoPush:      koPush,
-			BuildBinary: buildBinary,
-			KoBuild:     koBuild,
-			ReportName:  reportName,
-		},
-	)
+// 	buildDir := dag.GoMicroservice().RunBuildStage(
+// 		source,
+// 		dagger.GoMicroserviceRunBuildStageOpts{
+// 			GoVersion:   goVersion,
+// 			Os:          os,
+// 			Arch:        arch,
+// 			GoMainFile:  buildPath,
+// 			BinName:     binName,
+// 			Ldflags:     ldflags,
+// 			TokenName:   tokenName,
+// 			PackageName: packageName,
+// 			Token:       token,
+// 			KoRepo:      koRepo,
+// 			KoVersion:   koVersion,
+// 			KoBuildArg:  koBuildArg,
+// 			KoPush:      koPush,
+// 			BuildBinary: buildBinary,
+// 			KoBuild:     koBuild,
+// 			ReportName:  reportName,
+// 		},
+// 	)
 
-	return buildDir.File(reportName).Contents(ctx)
-}
+// 	return buildDir.File(reportName).Contents(ctx)
+// }
 
-func (m *Dagger) RunGoTests(
-	ctx context.Context,
-	source *dagger.Directory,
-	// +optional
-	// +default="1.25.4"
-	goVersion string,
-	// +optional
-	// +default="7.2.0-v18"
-	redisVersion string,
-	testPath string,
-) (string, error) {
+// func (m *Dagger) RunGoTests(
+// 	ctx context.Context,
+// 	source *dagger.Directory,
+// 	// +optional
+// 	// +default="1.25.4"
+// 	goVersion string,
+// 	// +optional
+// 	// +default="7.2.0-v18"
+// 	redisVersion string,
+// 	testPath string,
+// ) (string, error) {
 
-	return dag.
-		Homerun().
-		RunTestWithRedis(
-			ctx,
-			source,
-			testPath,
-			dagger.HomerunRunTestWithRedisOpts{
-				GoVersion:    goVersion,
-				RedisVersion: redisVersion,
-			},
-		)
-}
+// 	return dag.
+// 		Homerun().
+// 		RunTestWithRedis(
+// 			ctx,
+// 			source,
+// 			testPath,
+// 			dagger.HomerunRunTestWithRedisOpts{
+// 				GoVersion:    goVersion,
+// 				RedisVersion: redisVersion,
+// 			},
+// 		)
+// }
