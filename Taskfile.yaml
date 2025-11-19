@@ -17,6 +17,7 @@ tasks:
     cmds:
       - task: run-lint-stage
       - task: run-build-stage
+      - task: build-test-binary
 
   run-lint-stage:
     desc: Run linting stage for {{ .PROJECT_NAME }} using Dagger CI
@@ -42,7 +43,7 @@ tasks:
           KO_REPO: ghcr.io/{{ .ORGA_NAME }}/{{ .PROJECT_NAME }}
           EXPORT_PATH: /tmp/{{ .PROJECT_NAME}}/ci/build.txt
 
-  build-and-test-binary:
+  build-test-binary:
     desc: Build and test binary via Dagger CI
     vars:
       SRC: ./
