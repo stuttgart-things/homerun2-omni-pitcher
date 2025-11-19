@@ -13,18 +13,29 @@ vars:
   MODULE: github.com/{{ .ORGA_NAME }}/{{ .PROJECT_NAME }}
 
 tasks:
-  build-my-app:
-    desc: Build my Go microservice application
+  run-build-stage:
+    desc: Build {{ .PROJECT_NAME }} binary using Go and Ko using Dagger CI
     cmds:
       - task: go:run-build-stage
         vars:
           SRC: ./
-          BIN_NAME: my-service
-          LDFLAGS: '-X main.version={{.VERSION}} -X main.commit={{.COMMIT}}'
+          BIN_NAME: "{{ .PROJECT_NAME }}"
+          LDFLAGS: ''
           KO_BUILD: "true"
-          KO_PUSH: "true"
-          KO_REPO: ghcr.io/my-org/my-app
-          EXPORT_PATH: /tmp/build-output/
+          KO_PUSH: "false"
+          KO_REPO: ghcr.io/{{ .ORGA_NAME }}/{{ .PROJECT_NAME }}
+          EXPORT_PATH: /tmp/{{ .PROJECT_NAME}}/build/
+
+  run-lint-stage:
+    desc: Run linting stage for {{ .PROJECT_NAME }} using Dagger CI
+    cmds:
+      - task: go:run-lint-stage
+        vars:
+          SRC: ./
+          TEST: "true"
+          GO_VERSION: "1.25.4"
+          LINT_CAN_FAIL: "true"
+          REPORT_PATH: /tmp/{{ .PROJECT_NAME }}/lint/
 
 
   default:
@@ -43,25 +54,6 @@ tasks:
         [ -n "$task_name" ] && task "$task_name"
 
 
-
-
-
-  run-static-checks:
-    cmds:
-      - |
-        dagger call -m {{ .CI_MODULE }} {{ .FUNCTION }} \
-        --src {{ .SRC }} \
-        --lintCanFail=true \
-        --go-Version=1.25.4 \
-        --test={{ .TEST }} \
-        --progress plain -vv \
-        export --path={{ .REPORT_PATH }}
-        cat {{ .REPORT_PATH }}
-    vars:
-      SRC: .
-      TEST: true
-      FUNCTION: run-static-stage
-      REPORT_PATH: /tmp/{{ .PROJECT_NAME }}-static-analysis-report.json
 
   run-go-tests:
     desc: Run Go tests via Dagger CI
