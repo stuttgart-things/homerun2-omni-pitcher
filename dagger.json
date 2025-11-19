@@ -6,6 +6,16 @@
   },
   "dependencies": [
     {
+      "name": "go",
+      "source": "github.com/stuttgart-things/dagger/go@v0.42.0",
+      "pin": "0d3c8e57dde6e4527287b81f28ce6e920768499a"
+    },
+    {
+      "name": "go-microservice",
+      "source": "github.com/stuttgart-things/blueprints/go-microservice@v1.24.0",
+      "pin": "f5f12a80e92761586a2e12cf85cfaba36b0faa20"
+    },
+    {
       "name": "homerun",
       "source": "github.com/stuttgart-things/dagger/homerun@v0.42.0",
       "pin": "0d3c8e57dde6e4527287b81f28ce6e920768499a"

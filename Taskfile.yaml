@@ -13,6 +13,20 @@ vars:
   MODULE: github.com/{{ .ORGA_NAME }}/{{ .PROJECT_NAME }}
 
 tasks:
+  build-my-app:
+    desc: Build my Go microservice application
+    cmds:
+      - task: go:run-build-stage
+        vars:
+          SRC: ./
+          BIN_NAME: my-service
+          LDFLAGS: '-X main.version={{.VERSION}} -X main.commit={{.COMMIT}}'
+          KO_BUILD: "true"
+          KO_PUSH: "true"
+          KO_REPO: ghcr.io/my-org/my-app
+          EXPORT_PATH: /tmp/build-output/
+
+
   default:
     desc: Default task is select & do (work)
     cmds:
@@ -28,7 +42,11 @@ tasks:
         # Run the selected task
         [ -n "$task_name" ] && task "$task_name"
 
-  ci-run-static-checks:
+
+
+
+
+  run-static-checks:
     cmds:
       - |
         dagger call -m {{ .CI_MODULE }} {{ .FUNCTION }} \
@@ -45,7 +63,7 @@ tasks:
       FUNCTION: run-static-stage
       REPORT_PATH: /tmp/{{ .PROJECT_NAME }}-static-analysis-report.json
 
-  ci-run-tests:
+  run-go-tests:
     desc: Run Go tests via Dagger CI
     cmds:
       - |
@@ -55,7 +73,41 @@ tasks:
         --go-Version=1.25.4 \
         --progress plain -vv
     vars:
-      CI_MODULE: dagger
+      CI_MODULE: github.com/stuttgart-things/dagger/homerun@v0.42.0
       SRC: ./
       TEST_PATH: .
-      FUNCTION: run-go-tests
+      FUNCTION: run-test-with-redis
+
+  run-redis-cli:
+    desc: Run Redis cli via Dagger
+    cmds:
+      - |
+        dagger call -m github.com/stuttgart-things/dagger/homerun@v0.42.0 redis-cli terminal
+
+  run-redis-as-service:
+    desc: Run Redis as service via Dagger
+    cmds:
+      - |
+        dagger call -m github.com/stuttgart-things/dagger/homerun@v0.42.0 run-redis --port {{ .PORT }} --password "{{ .PASSWORD }}" up
+    vars:
+      PORT: 6379
+      PASSWORD: mypass # pragma: allowlist secret
+
+  ci-run-linting:
+    desc: Run repository linting via Dagger blueprint
+    cmds:
+      - |
+        dagger call -m {{ .LINTING_MODULE }}@{{ .LINTING_VERSION }} {{ .FUNCTION }} \
+        --src {{ .SRC }} \
+        --yaml-config-path {{ .YAML_CONFIG_PATH }} \
+        --progress plain -vv \
+        export --path {{ .REPORT_PATH }}
+
+        cat {{ .REPORT_PATH }}
+    vars:
+      LINTING_MODULE: github.com/stuttgart-things/blueprints/repository-linting
+      LINTING_VERSION: v1.17.0
+      SRC: .
+      YAML_CONFIG_PATH: ""
+      FUNCTION: validate-multiple-technologies
+      REPORT_PATH: /tmp/{{ .PROJECT_NAME }}-lint-findings.txt
