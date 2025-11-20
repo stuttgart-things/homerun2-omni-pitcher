@@ -39,7 +39,7 @@ tasks:
           BIN_NAME: "{{ .PROJECT_NAME }}"
           LDFLAGS: ''
           KO_BUILD: "true"
-          KO_PUSH: "false"
+          KO_PUSH: "true"
           KO_REPO: ghcr.io/{{ .ORGA_NAME }}/{{ .PROJECT_NAME }}
           EXPORT_PATH: /tmp/{{ .PROJECT_NAME}}/ci/build.txt
 

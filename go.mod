@@ -1,6 +1,6 @@
 module github.com/stuttgart-things/homerun2-omni-pitcher
 
-go 1.24.10
+go 1.24.2
 
 require github.com/stuttgart-things/homerun-library v1.2.1-0.20251113075110-883768414c9f
 
