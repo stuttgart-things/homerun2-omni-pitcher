@@ -10,6 +10,7 @@ vars:
     sh: echo ${PWD##*/}
   ORGA_NAME: stuttgart-things
   MODULE: github.com/{{ .ORGA_NAME }}/{{ .PROJECT_NAME }}
+  IMAGE: ghcr.io/{{ .ORGA_NAME }}/{{ .PROJECT_NAME }}
 
 tasks:
   run-lint-and-build:

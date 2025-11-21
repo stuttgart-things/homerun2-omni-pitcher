@@ -2,6 +2,19 @@
 
 A Go web service that provides an HTTP API for pitching messages to Redis Streams using the [homerun-library](https://github.com/stuttgart-things/homerun-library).
 
+## DEV
+
+## DEPLOYMENT
+
+```bash
+helmfile apply -f \
+git::https://github.com/stuttgart-things/helm.git@database/redis-stack.yaml.gotmpl \
+--state-values-set storageClass=openebs-hostpath \
+--state-values-set password="<REPLACE>" \
+--state-values-set namespace=homerun2
+```
+
+
 ## Features
 
 - RESTful HTTP API for sending messages to Redis Streams
@@ -9,12 +22,6 @@ A Go web service that provides an HTTP API for pitching messages to Redis Stream
 - Environment-based configuration
 - Health check endpoint
 - Simple curl-based interface
-
-## Installation
-
-```bash
-go build -o homerun2-omni-pitcher
-```
 
 ## Configuration
 
