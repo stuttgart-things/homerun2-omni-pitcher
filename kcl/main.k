@@ -2,10 +2,33 @@ import k8s.api.core.v1 as corev1
 import k8s.api.apps.v1 as appsv1
 import k8s.api.networking.v1 as networkingv1
 import k8s.apimachinery.pkg.apis.meta.v1 as metav1
+import regex
+import datetime
+import crypto
+
+# Helper function to generate a random token from timestamp and hash
+# Note: This generates a deterministic token based on timestamp. For production,
+# set authToken explicitly via -D flag or kcl.yaml
+_generateToken = lambda {
+    _timestamp = str(datetime.now())
+    _seed = "homerun2-omni-pitcher-${_timestamp}"
+    _hash = crypto.sha256(_seed)
+    # Take first 32 characters of the hash
+    _hash[:32]
+}
+
+# Configuration variables - can be overridden via -D flag
+hostname = option("hostname") or "homerun2-omni-pitcher"
+domain = option("domain") or "example.com"
+clusterIssuer = option("clusterIssuer") or "cluster-issuer-approle"
+authToken = option("authToken") or _generateToken()
+redisAddress = option("redisAddress") or "redis-stack.homerun2.svc.cluster.local:6379"
+redisPassword = option("redisPassword") or "CHANGE-ME-TO-ACTUAL-PASSWORD"
 
 # Common labels
 appName = "homerun2-omni-pitcher"
-namespace = "homerun2"
+namespace = option("namespace") or "homerun2"
+fqdn = "${hostname}.${domain}"
 
 commonLabels = {
     app = appName
@@ -45,7 +68,7 @@ secretToken = corev1.Secret {
     }
     type = "Opaque"
     stringData = {
-        "auth-token" = "CHANGE-ME-TO-ACTUAL-TOKEN"
+        "auth-token" = authToken
     }
 }
 
@@ -58,8 +81,8 @@ secretRedis = corev1.Secret {
     }
     type = "Opaque"
     stringData = {
-        address = "redis-stack.homerun2.svc.cluster.local:6379"
-        password = "Atlan7is2026"
+        address = redisAddress
+        password = redisPassword
     }
 }
 
@@ -268,21 +291,21 @@ ingress = networkingv1.Ingress {
             "nginx.ingress.kubernetes.io/proxy-send-timeout" = "60"
             "nginx.ingress.kubernetes.io/proxy-read-timeout" = "60"
             "nginx.ingress.kubernetes.io/limit-rps" = "100"
-            "cert-manager.io/cluster-issuer" = "cluster-issuer-approle"
-            "cert-manager.io/common-name" = "homerun2-omni-pitcher.demo-infra.sthings-vsphere.labul.sva.de"
+            "cert-manager.io/cluster-issuer" = clusterIssuer
+            "cert-manager.io/common-name" = fqdn
         }
     }
     spec = networkingv1.IngressSpec {
         ingressClassName = "nginx"
         tls = [
             networkingv1.IngressTLS {
-                hosts = ["homerun2-omni-pitcher.demo-infra.sthings-vsphere.labul.sva.de"]
+                hosts = [fqdn]
                 secretName = "${appName}-tls"
             }
         ]
         rules = [
             networkingv1.IngressRule {
-                host = "homerun2-omni-pitcher.demo-infra.sthings-vsphere.labul.sva.de"
+                host = fqdn
                 http = networkingv1.HTTPIngressRuleValue {
                     paths = [
                         networkingv1.HTTPIngressPath {

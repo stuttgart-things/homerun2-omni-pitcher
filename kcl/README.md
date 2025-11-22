@@ -27,12 +27,21 @@ The module dependencies are already configured in `kcl.mod`. To install/update t
 kcl mod download
 ```
 
-## Usage
+## Configuration
 
-### Generate YAML Output
+Configuration can be provided in three ways (in order of precedence):
+
+### 1. Using Command-Line Flags (Highest Priority)
 
 ```bash
-kcl run --format yaml \
+kcl run main.k \
+--format yaml \
+-D hostname=api \
+-D redisPassword="Test123" \ # pragma: allowlist secret
+-D domain=mycompany.io \
+-D clusterIssuer="letsencrypt-prod" \
+-D namespace=staging \
 | yq eval -P '.items[]' - \
-| awk 'BEGIN{doc=""} /^apiVersion: /{if(doc!=""){print "---";} doc=1} {print}'
+| sed '/^apiVersion:/s/^/---\n/' \
+| tail -n +2
 ```
