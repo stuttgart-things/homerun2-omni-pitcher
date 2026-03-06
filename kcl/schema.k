@@ -33,6 +33,13 @@ schema OmniPitcher:
     ingressTlsSecretName: str = "homerun2-omni-pitcher-tls"
     ingressAnnotations: {str:str} = {}
 
+    # HTTPRoute (Gateway API)
+    httpRouteEnabled: bool = False
+    httpRouteParentRefName: str = ""
+    httpRouteParentRefNamespace: str = ""
+    httpRouteHostname: str = ""
+    httpRouteAnnotations: {str:str} = {}
+
     # Redis
     redisAddr: str = "redis-stack.homerun2.svc.cluster.local"
     redisPort: str = "6379"
