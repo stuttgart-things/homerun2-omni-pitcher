@@ -1,6 +1,5 @@
 {
   "branches": ["main"],
-  "repositoryUrl": "https://github.com/stuttgart-things/homerun2-omni-pitcher",
   "tagFormat": "v${version}",
   "plugins": [
     [
