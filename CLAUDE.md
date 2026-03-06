@@ -54,11 +54,12 @@ homerun2-omni-pitcher — Go HTTP microservice that accepts JSON messages via `P
 - `internal/middleware/` — auth middleware
 - `internal/config/` — env-based config loading
 - `internal/models/` — response structs
-- `dagger/main.go` — CI functions (build, test with Redis)
-- `kcl/` — Kubernetes manifest definitions
-- `k8s/` — (legacy) hand-written YAML, to be replaced by KCL pipeline
-- `Taskfile.yaml` — task runner for build/test/deploy
+- `dagger/main.go` — CI functions (Lint, Build, BuildImage, ScanImage, BuildAndTestBinary)
+- `kcl/` — Kubernetes manifests (modular: schema.k, labels.k, deploy.k, service.k, ingress.k, secret.k, configmap.k, serviceaccount.k, namespace.k)
+- `tests/kcl-deploy-profile.yaml` — KCL deployment profile for parameterized rendering
+- `Taskfile.yaml` — task runner for build/test/deploy/release
 - `.ko.yaml` — ko build configuration
+- `.github/workflows/` — CI/CD (build-test, build-scan-image, release, lint-repo)
 
 ## Testing
 
@@ -69,8 +70,14 @@ go test ./...
 # Integration test via Dagger (spins up Redis)
 task build-test-binary
 
-# Full lint + build
-task run-lint-and-build
+# Lint
+task lint
+
+# Build + scan image
+task build-scan-image-ko
+
+# Render KCL manifests
+task render-manifests-quick
 ```
 
 ## Reference Project
