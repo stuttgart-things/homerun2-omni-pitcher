@@ -1,0 +1,9 @@
+defaultBaseImage: cgr.dev/chainguard/static:latest
+builds:
+  - id: homerun2-omni-pitcher
+    main: .
+    flags:
+      - -trimpath
+    ldflags:
+      - -s
+      - -w

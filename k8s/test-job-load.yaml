@@ -1,0 +1,119 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: homerun2-omni-pitcher-load-test
+  labels:
+    app: homerun2-omni-pitcher
+    app.kubernetes.io/name: homerun2-omni-pitcher
+    app.kubernetes.io/component: load-test
+spec:
+  parallelism: 5  # Run 5 pods in parallel
+  completions: 5   # Total 5 successful completions
+  backoffLimit: 2
+  ttlSecondsAfterFinished: 3600
+  template:
+    metadata:
+      labels:
+        app: homerun2-omni-pitcher-load-test
+    spec:
+      restartPolicy: Never
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        runAsGroup: 65534
+        fsGroup: 65534
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: load-test
+        image: curlimages/curl:8.11.1
+        command: ["/bin/sh"]
+        args:
+        - -c
+        - |
+          set -e
+
+          SERVICE_URL="http://homerun2-omni-pitcher.${NAMESPACE}.svc.cluster.local"
+          REQUESTS=50
+
+          echo "=========================================="
+          echo "Load Testing homerun2-omni-pitcher"
+          echo "Pod: ${HOSTNAME}"
+          echo "Requests: ${REQUESTS}"
+          echo "=========================================="
+          echo ""
+
+          SUCCESS=0
+          FAILED=0
+
+          for i in $(seq 1 ${REQUESTS}); do
+            if curl -f -s --max-time 5 -X POST "${SERVICE_URL}/pitch" \
+              -H "Content-Type: application/json" \
+              -H "Authorization: Bearer ${AUTH_TOKEN}" \
+              -d "{
+                \"title\": \"Load Test ${HOSTNAME}\",
+                \"message\": \"Request ${i} from pod ${HOSTNAME}\",
+                \"severity\": \"info\",
+                \"author\": \"load-test\",
+                \"system\": \"kubernetes-load-test\",
+                \"tags\": \"load-test\",
+                \"assigneeaddress\": \"test@example.com\",
+                \"assigneename\": \"Load Test\"
+              }" > /dev/null; then
+              SUCCESS=$((SUCCESS + 1))
+              echo "Request ${i}/${REQUESTS}: ✓"
+            else
+              FAILED=$((FAILED + 1))
+              echo "Request ${i}/${REQUESTS}: ✗"
+            fi
+
+            # Brief sleep between requests
+            sleep 0.1
+          done
+
+          echo ""
+          echo "=========================================="
+          echo "Load Test Results for ${HOSTNAME}"
+          echo "=========================================="
+          echo "Total Requests: ${REQUESTS}"
+          echo "Successful: ${SUCCESS}"
+          echo "Failed: ${FAILED}"
+          echo "Success Rate: $(awk "BEGIN {printf \"%.2f\", (${SUCCESS}/${REQUESTS})*100}")%"
+          echo "=========================================="
+
+          # Fail if success rate is below 95%
+          if [ $((SUCCESS * 100 / REQUESTS)) -lt 95 ]; then
+            echo "✗ Success rate below 95%, failing job"
+            exit 1
+          fi
+
+          echo "✓ Load test PASSED"
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: AUTH_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: homerun2-omni-pitcher-token
+              key: auth-token
+        - name: HOSTNAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        resources:
+          requests:
+            cpu: 100m
+            memory: 64Mi
+          limits:
+            cpu: 300m
+            memory: 128Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 65534
+          capabilities:
+            drop:
+            - ALL

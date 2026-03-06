@@ -1,0 +1,143 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: homerun2-omni-pitcher-test
+  labels:
+    app: homerun2-omni-pitcher
+    app.kubernetes.io/name: homerun2-omni-pitcher
+    app.kubernetes.io/component: test
+spec:
+  backoffLimit: 2
+  ttlSecondsAfterFinished: 3600  # Clean up after 1 hour
+  template:
+    metadata:
+      labels:
+        app: homerun2-omni-pitcher-test
+    spec:
+      restartPolicy: Never
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        runAsGroup: 65534
+        fsGroup: 65534
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: test
+        image: curlimages/curl:8.11.1
+        command: ["/bin/sh"]
+        args:
+        - -c
+        - |
+          set -e
+
+          echo "=========================================="
+          echo "Testing homerun2-omni-pitcher deployment"
+          echo "=========================================="
+          echo ""
+
+          SERVICE_URL="http://homerun2-omni-pitcher.${NAMESPACE}.svc.cluster.local"
+
+          echo "Service URL: ${SERVICE_URL}"
+          echo "Namespace: ${NAMESPACE}"
+          echo ""
+
+          # Test 1: Health endpoint
+          echo "=== Test 1: Health Endpoint ==="
+          if curl -f -v --max-time 10 "${SERVICE_URL}/health"; then
+            echo "✓ Health check PASSED"
+          else
+            echo "✗ Health check FAILED"
+            exit 1
+          fi
+          echo ""
+
+          # Test 2: Pitch endpoint with valid token
+          echo "=== Test 2: Pitch Endpoint (Valid Token) ==="
+          if curl -f -v --max-time 10 -X POST "${SERVICE_URL}/pitch" \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer ${AUTH_TOKEN}" \
+            -d '{
+              "title": "Test Notification",
+              "message": "Testing Redis integration from Kubernetes",
+              "severity": "info",
+              "author": "k8s-test-job",
+              "system": "kubernetes-cluster",
+              "tags": "test,kubernetes",
+              "assigneeaddress": "test@example.com",
+              "assigneename": "Test User"
+            }'; then
+            echo "✓ Pitch endpoint with valid token PASSED"
+          else
+            echo "✗ Pitch endpoint with valid token FAILED"
+            exit 1
+          fi
+          echo ""
+
+          # Test 3: Pitch endpoint without token (should fail)
+          echo "=== Test 3: Pitch Endpoint (No Token - Should Fail) ==="
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 -X POST "${SERVICE_URL}/pitch" \
+            -H "Content-Type: application/json" \
+            -d '{"title": "Test"}')
+
+          if [ "$HTTP_CODE" = "401" ] || [ "$HTTP_CODE" = "403" ]; then
+            echo "✓ Authorization check PASSED (got expected ${HTTP_CODE})"
+          else
+            echo "✗ Authorization check FAILED (got ${HTTP_CODE}, expected 401/403)"
+            exit 1
+          fi
+          echo ""
+
+          # Test 4: Pitch endpoint with invalid token (should fail)
+          echo "=== Test 4: Pitch Endpoint (Invalid Token - Should Fail) ==="
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 -X POST "${SERVICE_URL}/pitch" \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer invalid-token-12345" \
+            -d '{"title": "Test"}')
+
+          if [ "$HTTP_CODE" = "401" ] || [ "$HTTP_CODE" = "403" ]; then
+            echo "✓ Invalid token check PASSED (got expected ${HTTP_CODE})"
+          else
+            echo "✗ Invalid token check FAILED (got ${HTTP_CODE}, expected 401/403)"
+            exit 1
+          fi
+          echo ""
+
+          # Test 5: Service connectivity and DNS resolution
+          echo "=== Test 5: Service DNS Resolution ==="
+          if nslookup homerun2-omni-pitcher.${NAMESPACE}.svc.cluster.local; then
+            echo "✓ DNS resolution PASSED"
+          else
+            echo "✗ DNS resolution FAILED"
+            exit 1
+          fi
+          echo ""
+
+          echo "=========================================="
+          echo "✓ All tests PASSED successfully!"
+          echo "=========================================="
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: AUTH_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: homerun2-omni-pitcher-token
+              key: auth-token
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 200m
+            memory: 128Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 65534
+          capabilities:
+            drop:
+            - ALL

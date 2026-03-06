@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: homerun2-omni-pitcher-config
+  labels:
+    app: homerun2-omni-pitcher
+    app.kubernetes.io/name: homerun2-omni-pitcher
+    app.kubernetes.io/component: api
+data:
+  # Application configuration
+  LOG_LEVEL: "info"
+  # Add additional non-sensitive configuration here

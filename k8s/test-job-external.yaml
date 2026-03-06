@@ -1,0 +1,111 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: homerun2-omni-pitcher-test-external
+  labels:
+    app: homerun2-omni-pitcher
+    app.kubernetes.io/name: homerun2-omni-pitcher
+    app.kubernetes.io/component: test
+spec:
+  backoffLimit: 2
+  ttlSecondsAfterFinished: 3600  # Clean up after 1 hour
+  template:
+    metadata:
+      labels:
+        app: homerun2-omni-pitcher-test
+    spec:
+      restartPolicy: Never
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        runAsGroup: 65534
+        fsGroup: 65534
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: test
+        image: curlimages/curl:8.11.1
+        command: ["/bin/sh"]
+        args:
+        - -c
+        - |
+          set -e
+
+          echo "=========================================="
+          echo "Testing homerun2-omni-pitcher via Ingress"
+          echo "=========================================="
+          echo ""
+
+          # EXTERNAL_URL should be set to your ingress hostname
+          echo "External URL: ${EXTERNAL_URL}"
+          echo ""
+
+          # Test 1: Health endpoint via ingress
+          echo "=== Test 1: Health Endpoint (Ingress) ==="
+          if curl -f -v --max-time 10 "${EXTERNAL_URL}/health"; then
+            echo "✓ Health check via ingress PASSED"
+          else
+            echo "✗ Health check via ingress FAILED"
+            exit 1
+          fi
+          echo ""
+
+          # Test 2: Pitch endpoint with valid token via ingress
+          echo "=== Test 2: Pitch Endpoint via Ingress (Valid Token) ==="
+          if curl -f -v --max-time 10 -X POST "${EXTERNAL_URL}/pitch" \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer ${AUTH_TOKEN}" \
+            -d '{
+              "title": "External Test Notification",
+              "message": "Testing via Ingress from Kubernetes",
+              "severity": "info",
+              "author": "k8s-external-test",
+              "system": "kubernetes-ingress",
+              "tags": "test,kubernetes,ingress",
+              "assigneeaddress": "test@example.com",
+              "assigneename": "Test User"
+            }'; then
+            echo "✓ Pitch endpoint via ingress PASSED"
+          else
+            echo "✗ Pitch endpoint via ingress FAILED"
+            exit 1
+          fi
+          echo ""
+
+          # Test 3: SSL/TLS check (if HTTPS)
+          if echo "${EXTERNAL_URL}" | grep -q "https://"; then
+            echo "=== Test 3: TLS Certificate Check ==="
+            if curl -v --max-time 10 "${EXTERNAL_URL}/health" 2>&1 | grep -q "SSL certificate verify ok"; then
+              echo "✓ TLS certificate PASSED"
+            else
+              echo "⚠ TLS certificate check warning (might be self-signed or invalid)"
+            fi
+            echo ""
+          fi
+
+          echo "=========================================="
+          echo "✓ All external tests PASSED successfully!"
+          echo "=========================================="
+        env:
+        - name: EXTERNAL_URL
+          value: "https://homerun2-omni-pitcher.example.com"  # CHANGE-ME: Update with your actual domain
+        - name: AUTH_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: homerun2-omni-pitcher-token
+              key: auth-token
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 200m
+            memory: 128Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 65534
+          capabilities:
+            drop:
+            - ALL

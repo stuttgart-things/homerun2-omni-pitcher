@@ -6,6 +6,9 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/handlers"
+	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/models"
 )
 
 func TestHealthHandler(t *testing.T) {
@@ -15,7 +18,7 @@ func TestHealthHandler(t *testing.T) {
 	}
 
 	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(healthHandler)
+	handler := http.HandlerFunc(handlers.HealthHandler)
 	handler.ServeHTTP(rr, req)
 
 	if status := rr.Code; status != http.StatusOK {
@@ -39,7 +42,7 @@ func TestHealthHandlerMethodNotAllowed(t *testing.T) {
 	}
 
 	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(healthHandler)
+	handler := http.HandlerFunc(handlers.HealthHandler)
 	handler.ServeHTTP(rr, req)
 
 	if status := rr.Code; status != http.StatusMethodNotAllowed {
@@ -83,14 +86,14 @@ func TestPitchHandlerValidation(t *testing.T) {
 			req.Header.Set("Content-Type", "application/json")
 
 			rr := httptest.NewRecorder()
-			handler := http.HandlerFunc(pitchHandler)
+			handler := http.HandlerFunc(handlers.PitchHandler)
 			handler.ServeHTTP(rr, req)
 
 			if status := rr.Code; status != tt.expectedStatus {
 				t.Errorf("handler returned wrong status code: got %v want %v", status, tt.expectedStatus)
 			}
 
-			var response PitchResponse
+			var response models.PitchResponse
 			if err := json.Unmarshal(rr.Body.Bytes(), &response); err != nil {
 				t.Errorf("could not unmarshal response: %v", err)
 			}
@@ -113,7 +116,7 @@ func TestPitchHandlerMethodNotAllowed(t *testing.T) {
 	}
 
 	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(pitchHandler)
+	handler := http.HandlerFunc(handlers.PitchHandler)
 	handler.ServeHTTP(rr, req)
 
 	if status := rr.Code; status != http.StatusMethodNotAllowed {
