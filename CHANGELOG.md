@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.0.0...v1.0.1) (2026-03-06)
+
+
+### Bug Fixes
+
+* add .goreleaser.yaml for release binary builds ([#42](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/42)) ([4ee0b8c](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/4ee0b8c230a93f7b10f9d9405346225e21df7202))
+
 # 1.0.0 (2026-03-06)
 
 
