@@ -1,0 +1,27 @@
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: homerun2-omni-pitcher
+  description: HTTP gateway microservice that receives pitch requests and enqueues them to Redis Streams
+  annotations:
+    github.com/project-slug: stuttgart-things/homerun2-omni-pitcher
+    backstage.io/techdocs-ref: url:https://github.com/stuttgart-things/homerun2-omni-pitcher/tree/main
+    backstage.io/source-location: url:https://github.com/stuttgart-things/homerun2-omni-pitcher
+  tags:
+    - api
+    - redis
+    - golang
+    - homerun2
+    - gateway
+  links:
+    - url: https://github.com/stuttgart-things/homerun2-omni-pitcher
+      title: GitHub Repository
+      icon: github
+spec:
+  type: service
+  lifecycle: production
+  owner: platform-team
+  system: homerun2
+  dependsOn:
+    - resource:redis
