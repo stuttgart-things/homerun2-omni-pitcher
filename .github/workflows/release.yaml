@@ -19,4 +19,6 @@ jobs:
       push-kustomize: true
       kcl-profile-file: tests/kcl-deploy-profile.yaml
       kustomize-oci-repo: ghcr.io/stuttgart-things/homerun2-omni-pitcher-kustomize
-    secrets: inherit
+    secrets:
+      GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+      DAGGER_CLOUD_TOKEN: ${{ secrets.DAGGER_CLOUD_TOKEN }}
