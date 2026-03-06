@@ -1,3 +1,10 @@
+## [0.1.1](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v0.1.0...v0.1.1) (2026-03-06)
+
+
+### Bug Fixes
+
+* accept int or str for redisPort in KCL schema ([#46](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/46)) ([27b55ef](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/27b55ef3a8d8b787beb5908008b739a55e77d639))
+
 # [0.1.0](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v0.0.0...v0.1.0) (2026-03-06)
 
 
