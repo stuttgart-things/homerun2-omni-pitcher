@@ -1,16 +1,7 @@
-// A generated module for Dagger functions
+// Dagger CI module for homerun2-omni-pitcher
 //
-// This module has been generated via dagger init and serves as a reference to
-// basic module structure as you get started with Dagger.
-//
-// Two functions have been pre-created. You can modify, delete, or add to them,
-// as needed. They demonstrate usage of arguments and return types using simple
-// echo and grep commands. The functions can be called from the dagger CLI or
-// from one of the SDKs.
-//
-// The first line in this comment block is a short description line and the
-// rest is a long description with more detail on the module's purpose or usage,
-// if appropriate. All modules should have a short description.
+// Provides build, lint, test, image build, and security scanning functions.
+// Delegates to external stuttgart-things Dagger modules where possible.
 
 package main
 
@@ -22,6 +13,80 @@ import (
 
 type Dagger struct{}
 
+// Lint runs golangci-lint on the source code
+func (m *Dagger) Lint(
+	ctx context.Context,
+	src *dagger.Directory,
+	// +optional
+	// +default="500s"
+	timeout string,
+) *dagger.Container {
+	return dag.Go().Lint(src, dagger.GoLintOpts{
+		Timeout: timeout,
+	})
+}
+
+// Build compiles the Go binary
+func (m *Dagger) Build(
+	ctx context.Context,
+	src *dagger.Directory,
+	// +optional
+	// +default="main"
+	binName string,
+	// +optional
+	// +default=""
+	ldflags string,
+	// +optional
+	// +default="1.25.4"
+	goVersion string,
+	// +optional
+	// +default="linux"
+	os string,
+	// +optional
+	// +default="amd64"
+	arch string,
+) *dagger.Directory {
+	return dag.Go().BuildBinary(src, dagger.GoBuildBinaryOpts{
+		GoVersion:  goVersion,
+		Os:         os,
+		Arch:       arch,
+		BinName:    binName,
+		Ldflags:    ldflags,
+		GoMainFile: "main.go",
+	})
+}
+
+// BuildImage builds a container image using ko and optionally pushes it
+func (m *Dagger) BuildImage(
+	ctx context.Context,
+	src *dagger.Directory,
+	// +optional
+	// +default="ko.local/homerun2-omni-pitcher"
+	repo string,
+	// +optional
+	// +default="false"
+	push string,
+) (string, error) {
+	return dag.Go().KoBuild(ctx, src, dagger.GoKoBuildOpts{
+		Repo: repo,
+		Push: push,
+	})
+}
+
+// ScanImage scans a container image for vulnerabilities using Trivy
+func (m *Dagger) ScanImage(
+	ctx context.Context,
+	imageRef string,
+	// +optional
+	// +default="HIGH,CRITICAL"
+	severity string,
+) *dagger.File {
+	return dag.Trivy().ScanImage(imageRef, dagger.TrivyScanImageOpts{
+		Severity: severity,
+	})
+}
+
+// BuildAndTestBinary builds the binary and runs integration tests with Redis
 func (m *Dagger) BuildAndTestBinary(
 	ctx context.Context,
 	source *dagger.Directory,
@@ -54,7 +119,6 @@ func (m *Dagger) BuildAndTestBinary(
 	port int,
 ) (*dagger.File, error) {
 
-	// Build the binary
 	binDir := dag.Go().BuildBinary(
 		source,
 		dagger.GoBuildBinaryOpts{
@@ -67,13 +131,11 @@ func (m *Dagger) BuildAndTestBinary(
 			PackageName: packageName,
 		})
 
-	// Start Redis service for testing
 	redisService := dag.Homerun().RedisService(dagger.HomerunRedisServiceOpts{
 		Version:  "7.2.0-v18",
 		Password: "",
 	})
 
-	// Build test command: start binary, test health endpoint, test pitch endpoint, stop binary
 	testCmd := fmt.Sprintf(`
 exec > /app/test-output.log 2>&1
 set -e
@@ -129,115 +191,12 @@ exit 0
 		WithEnvVariable("AUTH_TOKEN", "test-token-12345").
 		WithExec([]string{"sh", "-c", testCmd}, dagger.ContainerWithExecOpts{})
 
-	// Check if tests passed
 	_, err := result.Sync(ctx)
 	if err != nil {
-		// Return logs even on failure
 		testLog := result.File("/app/test-output.log")
 		return testLog, fmt.Errorf("tests failed - check test-output.log for details: %w", err)
 	}
 
-	// Return the test log file
 	testLog := result.File("/app/test-output.log")
 	return testLog, nil
 }
-
-// func (m *Dagger) BuildAndTestBinary(
-// 	ctx context.Context,
-// 	source *dagger.Directory,
-// 	// +optional
-// 	// +default="1.25.4"
-// 	goVersion string,
-// 	buildPath string,
-// 	testPath string,
-// 	// +optional
-// 	// +default="linux"
-// 	os string,
-// 	// +optional
-// 	// +default="amd64"
-// 	arch string,
-// 	// +optional
-// 	// +default="main"
-// 	binName string,
-// 	// +optional
-// 	// +default=""
-// 	ldflags string,
-// 	// +optional
-// 	// +default="GITHUB_TOKEN"
-// 	tokenName string,
-// 	// +optional
-// 	// +default=""
-// 	packageName string,
-// 	// +optional
-// 	token *dagger.Secret,
-// 	// +optional
-// 	// +default="ko.local"
-// 	koRepo string,
-// 	// +optional
-// 	// +default="v0.18.0"
-// 	koVersion string,
-// 	// +optional
-// 	// +default="."
-// 	koBuildArg string,
-// 	// +optional
-// 	// +default="false"
-// 	koPush string,
-// 	// +optional
-// 	// +default=true
-// 	buildBinary bool,
-// 	// +optional
-// 	// +default=true
-// 	koBuild bool,
-// 	// +optional
-// 	// +default="build-report.txt"
-// 	reportName string) (string, error) {
-
-// 	buildDir := dag.GoMicroservice().RunBuildStage(
-// 		source,
-// 		dagger.GoMicroserviceRunBuildStageOpts{
-// 			GoVersion:   goVersion,
-// 			Os:          os,
-// 			Arch:        arch,
-// 			GoMainFile:  buildPath,
-// 			BinName:     binName,
-// 			Ldflags:     ldflags,
-// 			TokenName:   tokenName,
-// 			PackageName: packageName,
-// 			Token:       token,
-// 			KoRepo:      koRepo,
-// 			KoVersion:   koVersion,
-// 			KoBuildArg:  koBuildArg,
-// 			KoPush:      koPush,
-// 			BuildBinary: buildBinary,
-// 			KoBuild:     koBuild,
-// 			ReportName:  reportName,
-// 		},
-// 	)
-
-// 	return buildDir.File(reportName).Contents(ctx)
-// }
-
-// func (m *Dagger) RunGoTests(
-// 	ctx context.Context,
-// 	source *dagger.Directory,
-// 	// +optional
-// 	// +default="1.25.4"
-// 	goVersion string,
-// 	// +optional
-// 	// +default="7.2.0-v18"
-// 	redisVersion string,
-// 	testPath string,
-// ) (string, error) {
-
-// 	return dag.
-// 		Homerun().
-// 		RunTestWithRedis(
-// 			ctx,
-// 			source,
-// 			testPath,
-// 			dagger.HomerunRunTestWithRedisOpts{
-// 				GoVersion:    goVersion,
-// 				RedisVersion: redisVersion,
-// 			},
-// 		)
-// }
