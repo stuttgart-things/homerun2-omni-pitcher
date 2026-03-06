@@ -17,6 +17,7 @@ jobs:
       runs-on: ubuntu-latest
       stage-image: true
       push-kustomize: true
+      kcl-source-dir: kcl
       kcl-profile-file: tests/kcl-deploy-profile.yaml
       kustomize-oci-repo: ghcr.io/stuttgart-things/homerun2-omni-pitcher-kustomize
     secrets: inherit
