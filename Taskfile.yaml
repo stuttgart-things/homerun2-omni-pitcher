@@ -2,62 +2,38 @@
 version: 3
 includes:
   git:
-    taskfile: https://raw.githubusercontent.com/stuttgart-things/platform-engineering-showcase/refs/heads/main/taskfiles/git.yaml
+    taskfile: https://raw.githubusercontent.com/stuttgart-things/tasks/refs/heads/main/git/git.yaml
+  lint:
+    taskfile: https://raw.githubusercontent.com/stuttgart-things/tasks/refs/heads/main/git/linting.yaml
   go:
-    taskfile: https://raw.githubusercontent.com/stuttgart-things/platform-engineering-showcase/refs/heads/main/taskfiles/go-microservice.yaml
+    taskfile: https://raw.githubusercontent.com/stuttgart-things/tasks/refs/heads/main/go/lint.yaml
+  dagger:
+    taskfile: https://raw.githubusercontent.com/stuttgart-things/tasks/refs/heads/main/dagger/modules.yaml
+  image:
+    taskfile: https://raw.githubusercontent.com/stuttgart-things/tasks/refs/heads/main/docker/copy.yaml
+  goBuild:
+    taskfile: https://raw.githubusercontent.com/stuttgart-things/tasks/refs/heads/main/go/build.yaml
+  release:
+    taskfile: https://raw.githubusercontent.com/stuttgart-things/tasks/refs/heads/main/go/release-workflow.yaml
+
 vars:
-  PROJECT_NAME:
-    sh: echo ${PWD##*/}
+  PROJECT:
+    sh: basename $(pwd)
   ORGA_NAME: stuttgart-things
-  MODULE: github.com/{{ .ORGA_NAME }}/{{ .PROJECT_NAME }}
-  IMAGE: ghcr.io/{{ .ORGA_NAME }}/{{ .PROJECT_NAME }}
+  GO_MODULE: github.com/{{ .ORGA_NAME }}/{{ .PROJECT }}
+  DAGGER_MODULE_DIR: ./dagger
+  SOURCE_CODE_DIR: "."
+  DAGGER_KCL_MODULE: github.com/stuttgart-things/dagger/kcl@v0.82.0
+  KCL_SOURCE_DIR: kcl
+  KCL_PROFILE_FILE: tests/kcl-deploy-profile.yaml
+  RENDERED_OUTPUT_PATH: /tmp/rendered-{{ .PROJECT }}.yaml
+  LINT_REPORT_PATH: /tmp/lint-report-{{ .PROJECT }}.txt
+  TEST_REPORT_PATH: /tmp/test-report-{{ .PROJECT }}.txt
+  KUSTOMIZE_BASE_EXPORT_PATH: /tmp/kustomize-base-{{ .PROJECT }}
+  KUSTOMIZE_OCI_REPO: ghcr.io/{{ .ORGA_NAME }}/{{ .PROJECT }}-kustomize
+  TARGET_IMAGE_REPO: ghcr.io/{{ .ORGA_NAME }}/{{ .PROJECT }}
 
 tasks:
-  run-lint-and-build:
-    desc: Run lint and build stages sequentially for {{ .PROJECT_NAME }}
-    cmds:
-      - task: run-lint-stage
-      - task: run-build-stage
-      - task: build-test-binary
-
-  run-lint-stage:
-    desc: Run linting stage for {{ .PROJECT_NAME }} using Dagger CI
-    cmds:
-      - task: go:run-lint-stage
-        vars:
-          SRC: ./
-          TEST: "true"
-          GO_VERSION: "1.25.4"
-          LINT_CAN_FAIL: "true"
-          REPORT_PATH: /tmp/{{ .PROJECT_NAME }}/ci/lint.txt
-
-  run-build-stage:
-    desc: Build {{ .PROJECT_NAME }} binary using Go and Ko using Dagger CI
-    cmds:
-      - task: go:run-build-stage
-        vars:
-          SRC: ./
-          BIN_NAME: "{{ .PROJECT_NAME }}"
-          LDFLAGS: ''
-          KO_BUILD: "true"
-          KO_PUSH: "true"
-          KO_REPO: ghcr.io/{{ .ORGA_NAME }}/{{ .PROJECT_NAME }}
-          EXPORT_PATH: /tmp/{{ .PROJECT_NAME}}/ci/build.txt
-
-  build-test-binary:
-    desc: Build and test binary via Dagger CI
-    vars:
-      SRC: ./
-      FUNCTION: build-and-test-binary
-      EXPORT_PATH: /tmp/{{ .PROJECT_NAME}}/ci/build-test.txt
-    cmds:
-      - |
-        dagger call -m dagger \
-        build-and-test-binary \
-        --source "{{ .SRC }}" \
-        export --path={{ .EXPORT_PATH }} \
-        --progress plain -vv
-
   default:
     desc: Default task is select & do (work)
     cmds:
@@ -67,57 +43,321 @@ tasks:
     desc: Select a task to run
     cmds:
       - |
-        # Extract task names (keep internal colons, remove only trailing colon)
         task_name=$(task -l | awk '/^\*/ {print $2}' | sed 's/:$//' | gum choose)
-
-        # Run the selected task
         [ -n "$task_name" ] && task "$task_name"
 
-  run-go-tests:
-    desc: Run Go tests via Dagger CI
-    cmds:
-      - |
-        dagger call -m {{ .CI_MODULE }} {{ .FUNCTION }} \
-        --source {{ .SRC }} \
-        --test-path={{ .TEST_PATH }} \
-        --go-Version=1.25.4 \
-        --progress plain -vv
-    vars:
-      CI_MODULE: github.com/stuttgart-things/dagger/homerun@v0.42.0
-      SRC: ./
-      TEST_PATH: .
-      FUNCTION: run-test-with-redis
+  # === Lint ===
 
-  run-redis-cli:
-    desc: Run Redis cli via Dagger
+  lint:
+    desc: Run Go lint via Dagger module
     cmds:
       - |
-        dagger call -m github.com/stuttgart-things/dagger/homerun@v0.42.0 redis-cli terminal
-
-  run-redis-as-service:
-    desc: Run Redis as service via Dagger
-    cmds:
-      - |
-        dagger call -m github.com/stuttgart-things/dagger/homerun@v0.42.0 run-redis --port {{ .PORT }} --password "{{ .PASSWORD }}" up
-    vars:
-      PORT: 6379
-      PASSWORD: mypass # pragma: allowlist secret
+        dagger call -m {{ .DAGGER_MODULE_DIR }} lint \
+          --src "{{ .SOURCE_CODE_DIR }}" \
+          export --path={{ .LINT_REPORT_PATH }} \
+          --progress plain
 
   ci-run-linting:
     desc: Run repository linting via Dagger blueprint
     cmds:
       - |
         dagger call -m {{ .LINTING_MODULE }}@{{ .LINTING_VERSION }} {{ .FUNCTION }} \
-        --src {{ .SRC }} \
+        --src {{ .SOURCE_CODE_DIR }} \
         --yaml-config-path {{ .YAML_CONFIG_PATH }} \
         --progress plain -vv \
-        export --path {{ .REPORT_PATH }}
+        export --path {{ .LINT_REPORT_PATH }}
 
-        cat {{ .REPORT_PATH }}
+        cat {{ .LINT_REPORT_PATH }}
     vars:
       LINTING_MODULE: github.com/stuttgart-things/blueprints/repository-linting
       LINTING_VERSION: v1.17.0
-      SRC: .
       YAML_CONFIG_PATH: ""
       FUNCTION: validate-multiple-technologies
-      REPORT_PATH: /tmp/{{ .PROJECT_NAME }}-lint-findings.txt
+
+  # === Build & Test ===
+
+  build-test-binary:
+    desc: Build and test binary with Redis via Dagger
+    cmds:
+      - |
+        dagger call -m {{ .DAGGER_MODULE_DIR }} \
+        build-and-test-binary \
+        --source "{{ .SOURCE_CODE_DIR }}" \
+        export --path={{ .TEST_REPORT_PATH }} \
+        --progress plain -vv
+
+  build-output-binary:
+    desc: Build project binary
+    cmds:
+      - |
+        dagger call -m {{ .DAGGER_MODULE_DIR }} build \
+        --src "{{ .SOURCE_CODE_DIR }}" \
+        --bin-name="{{ .PROJECT }}" \
+        --progress plain -vv \
+        export --path=/tmp/go/build
+
+        ls -lta /tmp/go/build
+
+  # === Image Build & Scan ===
+
+  build-scan-image-ko:
+    desc: Build, push and scan container image with ko
+    cmds:
+      - |
+        RANDOM_TAG=$(openssl rand -hex 6)
+        REPO_NAME="ttl.sh/{{ .PROJECT }}-${RANDOM_TAG}"
+
+        echo "Building and pushing to: ${REPO_NAME}"
+
+        IMAGE_REF=$(dagger call -m {{ .DAGGER_MODULE_DIR }} build-image \
+          --src "{{ .SOURCE_CODE_DIR }}" \
+          --repo "$REPO_NAME" \
+          --push="true" \
+          --progress plain)
+
+        echo "Image pushed: $IMAGE_REF"
+        echo "Scanning with Trivy..."
+
+        dagger call -m {{ .DAGGER_MODULE_DIR }} scan-image \
+          --image-ref "$IMAGE_REF" \
+          --severity "HIGH,CRITICAL" \
+          --progress plain \
+          export --path=/tmp/trivy-scan-{{ .PROJECT }}.json
+
+        echo "Build and scan complete!"
+        echo "Image: $IMAGE_REF"
+        echo "Scan Report: /tmp/trivy-scan-{{ .PROJECT }}.json"
+
+        if command -v jq &> /dev/null; then
+          echo ""
+          jq -r '.Results[]? | select(.Vulnerabilities) | "\(.Target): \(.Vulnerabilities | length) vulnerabilities"' \
+            /tmp/trivy-scan-{{ .PROJECT }}.json 2>/dev/null || echo "No HIGH/CRITICAL vulnerabilities found!"
+        fi
+
+  scan-image:
+    desc: Scan container image for vulnerabilities with Trivy
+    vars:
+      IMAGE_REF: '{{ .IMAGE_REF | default "ttl.sh/example:latest" }}'
+      SEVERITY: '{{ .SEVERITY | default "HIGH,CRITICAL" }}'
+    cmds:
+      - |
+        echo "Scanning image: {{ .IMAGE_REF }}"
+
+        dagger call -m {{ .DAGGER_MODULE_DIR }} scan-image \
+          --image-ref "{{ .IMAGE_REF }}" \
+          --severity "{{ .SEVERITY }}" \
+          --progress plain \
+          export --path=/tmp/trivy-scan-{{ .PROJECT }}.json
+
+        echo "Scan complete! Report: /tmp/trivy-scan-{{ .PROJECT }}.json"
+
+        if command -v jq &> /dev/null; then
+          jq -r '.Results[]? | select(.Vulnerabilities) | "\(.Target): \(.Vulnerabilities | length) vulnerabilities"' \
+            /tmp/trivy-scan-{{ .PROJECT }}.json 2>/dev/null || echo "No vulnerabilities found!"
+        fi
+
+  stage-image:
+    desc: Copy image from ttl.sh to ghcr.io with git tag version
+    vars:
+      VERSION:
+        sh: git describe --tags --abbrev=0 2>/dev/null || echo "0.0.0"
+      SOURCE_IMAGE: '{{ .SOURCE_IMAGE | default "ttl.sh/homerun2-omni-pitcher:latest" }}'
+    cmds:
+      - task: image:copy-image
+        vars:
+          SOURCE: "{{ .SOURCE_IMAGE }}"
+          TARGET: "{{ .TARGET_IMAGE_REPO }}:{{ .VERSION }}"
+          TARGET_USERNAME: $GITHUB_USER
+          TARGET_PASSWORD: env:GITHUB_TOKEN # pragma: allowlist secret
+
+  # === KCL Manifest Rendering ===
+
+  render-manifests:
+    desc: Render Kubernetes manifests using KCL via Dagger
+    vars:
+      SOURCE:
+        sh: 'gum input --placeholder "Source directory" --value "{{ .KCL_SOURCE_DIR }}" --header "KCL SOURCE DIRECTORY"'
+      PROFILE:
+        sh: 'gum input --placeholder "Profile file path" --value "{{ .KCL_PROFILE_FILE }}" --header "PARAMETERS FILE"'
+      DESTINATION:
+        sh: 'gum input --placeholder "Output path" --value "{{ .RENDERED_OUTPUT_PATH }}" --header "OUTPUT PATH"'
+    cmds:
+      - |
+        echo "Rendering manifests with KCL..."
+        echo "Source: {{ .SOURCE }}"
+        echo "Profile: {{ .PROFILE }}"
+        echo "Output: {{ .DESTINATION }}"
+
+        dagger call -m {{ .DAGGER_KCL_MODULE }} run \
+          --source "{{ .SOURCE }}" \
+          --parameters-file="{{ .PROFILE }}" \
+          export --path="{{ .DESTINATION }}"
+
+        echo "Manifests rendered: {{ .DESTINATION }}"
+        if [ -f "{{ .DESTINATION }}" ]; then
+          head -n 20 "{{ .DESTINATION }}"
+          echo "... (cat {{ .DESTINATION }} for full file)"
+        fi
+
+  render-manifests-quick:
+    desc: Render Kubernetes manifests (non-interactive, uses defaults)
+    vars:
+      SOURCE: '{{ .SOURCE | default .KCL_SOURCE_DIR }}'
+      PROFILE: '{{ .PROFILE | default .KCL_PROFILE_FILE }}'
+      DESTINATION: '{{ .DESTINATION | default .RENDERED_OUTPUT_PATH }}'
+    cmds:
+      - |
+        dagger call -m {{ .DAGGER_KCL_MODULE }} run \
+          --source "{{ .SOURCE }}" \
+          --parameters-file="{{ .PROFILE }}" \
+          export --path="{{ .DESTINATION }}"
+
+        echo "Manifests rendered: {{ .DESTINATION }}"
+
+  # === Kustomize Base Pipeline ===
+
+  render-kustomize-base:
+    desc: Render kustomize base from KCL deployment manifests
+    vars:
+      SOURCE: '{{ .SOURCE | default .KCL_SOURCE_DIR }}'
+      PROFILE: '{{ .PROFILE | default .KCL_PROFILE_FILE }}'
+      DESTINATION: '{{ .DESTINATION | default .KUSTOMIZE_BASE_EXPORT_PATH }}'
+    cmds:
+      - |
+        echo "Rendering kustomize base with KCL..."
+
+        dagger call -m {{ .DAGGER_KCL_MODULE }} render-kustomize-base \
+          --source "{{ .SOURCE }}" \
+          --parameters-file="{{ .PROFILE }}" \
+          export --path="{{ .DESTINATION }}" \
+          --progress plain
+
+        echo "Kustomize base rendered: {{ .DESTINATION }}"
+        ls -la "{{ .DESTINATION }}/"
+
+  push-kustomize-base:
+    desc: Render and push kustomize base as OCI artifact
+    vars:
+      SOURCE: '{{ .SOURCE | default .KCL_SOURCE_DIR }}'
+      PROFILE: '{{ .PROFILE | default .KCL_PROFILE_FILE }}'
+      TAG:
+        sh: 'gum input --placeholder "Enter version tag (e.g., v1.0.0)" --header "OCI TAG"'
+    cmds:
+      - |
+        echo "Pushing kustomize base as OCI artifact..."
+        echo "Target: {{ .KUSTOMIZE_OCI_REPO }}:{{ .TAG }}"
+
+        dagger call -m {{ .DAGGER_KCL_MODULE }} push-kustomize-base \
+          --source "{{ .SOURCE }}" \
+          --parameters-file="{{ .PROFILE }}" \
+          --address "{{ .KUSTOMIZE_OCI_REPO }}" \
+          --tag "{{ .TAG }}" \
+          --user env:GITHUB_USER \
+          --password env:GITHUB_TOKEN \
+          --progress plain
+
+        echo "OCI artifact pushed: {{ .KUSTOMIZE_OCI_REPO }}:{{ .TAG }}"
+
+  deploy-pull-base:
+    desc: Pull kustomize base from OCI registry
+    vars:
+      VERSION:
+        sh: 'gum input --placeholder "Enter version (e.g., v0.5.6)" --value "$(git describe --tags --abbrev=0 2>/dev/null || echo v0.0.0)" --header "VERSION"'
+    cmds:
+      - |
+        echo "Pulling kustomize base..."
+        echo "Source: {{ .KUSTOMIZE_OCI_REPO }}:{{ .VERSION }}"
+
+        rm -rf "{{ .KUSTOMIZE_BASE_EXPORT_PATH }}"
+        mkdir -p "{{ .KUSTOMIZE_BASE_EXPORT_PATH }}"
+
+        oras pull "{{ .KUSTOMIZE_OCI_REPO }}:{{ .VERSION }}" \
+          -o "{{ .KUSTOMIZE_BASE_EXPORT_PATH }}"
+
+        echo "Kustomize base pulled!"
+        ls -la "{{ .KUSTOMIZE_BASE_EXPORT_PATH }}/"
+
+  deploy-apply:
+    desc: Apply kustomize base or overlay to cluster
+    vars:
+      OVERLAY:
+        sh: |
+          BASE="{{ .KUSTOMIZE_BASE_EXPORT_PATH }}"
+          ALL="${BASE}"
+          echo "$ALL" | gum choose --header "SELECT KUSTOMIZE TARGET"
+    cmds:
+      - |
+        echo "Preview of: {{ .OVERLAY }}"
+        echo "---"
+        kubectl kustomize "{{ .OVERLAY }}"
+        echo "---"
+      - |
+        if gum confirm "Apply to cluster?"; then
+          kubectl apply -k "{{ .OVERLAY }}"
+          echo "Applied successfully!"
+        else
+          echo "Aborted."
+        fi
+
+  # === Release ===
+
+  release-local:
+    desc: Full release pipeline (local, interactive)
+    cmds:
+      - task: release:release-local
+        vars:
+          KCL_SOURCE_DIR: "{{ .KCL_SOURCE_DIR }}"
+          KCL_PROFILE_FILE: "{{ .KCL_PROFILE_FILE }}"
+          KUSTOMIZE_OCI_REPO: "{{ .KUSTOMIZE_OCI_REPO }}"
+          TARGET_IMAGE_REPO: "{{ .TARGET_IMAGE_REPO }}"
+
+  release-github:
+    desc: Full release pipeline (non-interactive, for CI)
+    cmds:
+      - task: release:release-github
+        vars:
+          KCL_SOURCE_DIR: "{{ .KCL_SOURCE_DIR }}"
+          KCL_PROFILE_FILE: "{{ .KCL_PROFILE_FILE }}"
+          KUSTOMIZE_OCI_REPO: "{{ .KUSTOMIZE_OCI_REPO }}"
+          TARGET_IMAGE_REPO: "{{ .TARGET_IMAGE_REPO }}"
+          SOURCE_IMAGE: "{{ .SOURCE_IMAGE }}"
+          VERSION: "{{ .VERSION }}"
+
+  trigger-release:
+    desc: Trigger Release workflow on GitHub Actions
+    cmds:
+      - |
+        echo "Triggering Release workflow..."
+        gh workflow run Release
+        sleep 2
+        RUN_ID=$(gh run list --workflow=Release --limit=1 --json databaseId --jq '.[0].databaseId')
+        echo "Run: https://github.com/{{ .ORGA_NAME }}/{{ .PROJECT }}/actions/runs/${RUN_ID}"
+        gh run watch "${RUN_ID}"
+
+  # === Redis (Development) ===
+
+  run-redis-cli:
+    desc: Run Redis CLI via Dagger
+    cmds:
+      - dagger call -m github.com/stuttgart-things/dagger/homerun@v0.72.0 redis-cli terminal
+
+  run-redis-as-service:
+    desc: Run Redis as service via Dagger
+    vars:
+      PORT: 6379
+      PASSWORD: mypass # pragma: allowlist secret
+    cmds:
+      - |
+        dagger call -m github.com/stuttgart-things/dagger/homerun@v0.72.0 \
+          run-redis --port {{ .PORT }} --password "{{ .PASSWORD }}" up
+
+  run-go-tests:
+    desc: Run Go tests with Redis via Dagger
+    cmds:
+      - |
+        dagger call -m github.com/stuttgart-things/dagger/homerun@v0.72.0 \
+        run-test-with-redis \
+        --source {{ .SOURCE_CODE_DIR }} \
+        --test-path=. \
+        --go-Version=1.25.4 \
+        --progress plain -vv
