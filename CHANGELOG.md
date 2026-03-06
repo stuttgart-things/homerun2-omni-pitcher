@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.0.1...v1.0.2) (2026-03-06)
+
+
+### Bug Fixes
+
+* remove windows from goreleaser build targets ([#43](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/43)) ([c8df477](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/c8df477d4e5d3f4610133c30d54d40eca27a0287))
+
 ## [1.0.1](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.0.0...v1.0.1) (2026-03-06)
 
 
