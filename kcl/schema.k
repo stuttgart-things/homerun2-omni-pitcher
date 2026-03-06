@@ -42,7 +42,7 @@ schema OmniPitcher:
 
     # Redis
     redisAddr: str = "redis-stack.homerun2.svc.cluster.local"
-    redisPort: str = "6379"
+    redisPort: int | str = "6379"
     redisStream: str = "messages"
 
     # Secrets
