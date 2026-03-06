@@ -175,56 +175,9 @@ func TestPitchHandler(t *testing.T) {
 	}
 }
 
-// TestPitchHandlerDefaultValues tests that default values are properly set
-// Note: This test validates the logic but cannot verify Redis enqueuing without integration testing
-func TestPitchHandlerDefaultValues(t *testing.T) {
-	// This test documents expected behavior for default values
-	// In practice, these would be validated in integration tests with actual Redis
-	tests := []struct {
-		name     string
-		input    homerun.Message
-		defaults map[string]string
-	}{
-		{
-			name: "Sets default severity",
-			input: homerun.Message{
-				Title:   "test",
-				Message: "test",
-			},
-			defaults: map[string]string{
-				"severity": "info",
-			},
-		},
-		{
-			name: "Sets default author",
-			input: homerun.Message{
-				Title:   "test",
-				Message: "test",
-			},
-			defaults: map[string]string{
-				"author": "unknown",
-			},
-		},
-		{
-			name: "Sets default system",
-			input: homerun.Message{
-				Title:   "test",
-				Message: "test",
-			},
-			defaults: map[string]string{
-				"system": "homerun2-omni-pitcher",
-			},
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			// Document expected defaults
-			t.Logf("Expected defaults: %v", tt.defaults)
-			// Actual validation would require mocking or integration testing
-		})
-	}
-}
+// Note: Default value testing and successful enqueue testing require
+// integration tests with a live Redis instance. See Dagger BuildAndTestBinary
+// for integration test coverage.
 
 func TestRespondWithError(t *testing.T) {
 	tests := []struct {
