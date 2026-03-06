@@ -64,7 +64,7 @@ deployment = {
                             }
                             {
                                 name: "REDIS_PORT"
-                                value: config.redisPort
+                                value: str(config.redisPort)
                             }
                             {
                                 name: "REDIS_PASSWORD"
