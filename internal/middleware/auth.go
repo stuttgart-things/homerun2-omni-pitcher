@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -12,16 +13,14 @@ func TokenAuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		authHeader := r.Header.Get("Authorization")
 		if authHeader == "" {
-			http.Error(w, `{"status":"error","message":"Missing authorization header"}`, http.StatusUnauthorized)
-			w.Header().Set("Content-Type", "application/json")
+			respondWithAuthError(w, http.StatusUnauthorized, "Missing authorization header")
 			return
 		}
 
 		// Check if the Authorization header has the Bearer scheme
 		parts := strings.SplitN(authHeader, " ", 2)
 		if len(parts) != 2 || parts[0] != "Bearer" {
-			http.Error(w, `{"status":"error","message":"Invalid authorization header format"}`, http.StatusUnauthorized)
-			w.Header().Set("Content-Type", "application/json")
+			respondWithAuthError(w, http.StatusUnauthorized, "Invalid authorization header format")
 			return
 		}
 
@@ -29,18 +28,22 @@ func TokenAuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 		expectedToken := homerun.GetEnv("AUTH_TOKEN", "")
 
 		if expectedToken == "" {
-			http.Error(w, `{"status":"error","message":"Server authentication not configured"}`, http.StatusInternalServerError)
-			w.Header().Set("Content-Type", "application/json")
+			respondWithAuthError(w, http.StatusInternalServerError, "Server authentication not configured")
 			return
 		}
 
 		if token != expectedToken {
-			http.Error(w, `{"status":"error","message":"Invalid token"}`, http.StatusUnauthorized)
-			w.Header().Set("Content-Type", "application/json")
+			respondWithAuthError(w, http.StatusUnauthorized, "Invalid token")
 			return
 		}
 
 		// Token is valid, proceed to the next handler
 		next.ServeHTTP(w, r)
 	}
+}
+
+func respondWithAuthError(w http.ResponseWriter, code int, message string) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(code)
+	fmt.Fprintf(w, `{"status":"error","message":"%s"}`, message)
 }
