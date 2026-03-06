@@ -2,7 +2,7 @@ module github.com/stuttgart-things/homerun2-omni-pitcher
 
 go 1.24.2
 
-require github.com/stuttgart-things/homerun-library v1.2.1-0.20251113075110-883768414c9f
+require github.com/stuttgart-things/homerun-library v1.2.1-0.20251122081303-7e9992b659a7
 
 require (
 	atomicgo.dev/cursor v0.2.0 // indirect
@@ -115,7 +115,7 @@ require (
 	github.com/huandu/xstrings v1.3.3 // indirect
 	github.com/imdario/mergo v0.3.13 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
-	github.com/jedib0t/go-pretty/v6 v6.7.1 // indirect
+	github.com/jedib0t/go-pretty/v6 v6.7.5 // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
 	github.com/klauspost/compress v1.17.11 // indirect
