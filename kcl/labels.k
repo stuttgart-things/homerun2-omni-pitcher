@@ -12,6 +12,11 @@ _ingressHost = option("config.ingressHost")
 _ingressTlsEnabled = option("config.ingressTlsEnabled")
 _ingressTlsSecretName = option("config.ingressTlsSecretName")
 _ingressAnnotations = option("config.ingressAnnotations") or {}
+_httpRouteEnabled = option("config.httpRouteEnabled")
+_httpRouteParentRefName = option("config.httpRouteParentRefName")
+_httpRouteParentRefNamespace = option("config.httpRouteParentRefNamespace")
+_httpRouteHostname = option("config.httpRouteHostname")
+_httpRouteAnnotations = option("config.httpRouteAnnotations") or {}
 _redisAddr = option("config.redisAddr")
 _redisPort = option("config.redisPort")
 _redisStream = option("config.redisStream")
@@ -35,6 +40,16 @@ config: schema.OmniPitcher = schema.OmniPitcher {
         ingressTlsSecretName = _ingressTlsSecretName
     if _ingressAnnotations:
         ingressAnnotations = _ingressAnnotations
+    if _httpRouteEnabled:
+        httpRouteEnabled = _httpRouteEnabled in [True, "True", "true"]
+    if _httpRouteParentRefName:
+        httpRouteParentRefName = _httpRouteParentRefName
+    if _httpRouteParentRefNamespace:
+        httpRouteParentRefNamespace = _httpRouteParentRefNamespace
+    if _httpRouteHostname:
+        httpRouteHostname = _httpRouteHostname
+    if _httpRouteAnnotations:
+        httpRouteAnnotations = _httpRouteAnnotations
     if _redisAddr:
         redisAddr = _redisAddr
     if _redisPort:
