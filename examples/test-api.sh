@@ -2,10 +2,19 @@
 
 # Example script to test homerun2-omni-pitcher API
 # Make sure the service is running before executing this script
+#
+# Required environment variables:
+#   AUTH_TOKEN - Bearer token for authentication
 
 set -e
 
 BASE_URL="${BASE_URL:-http://localhost:8080}"
+
+if [ -z "${AUTH_TOKEN}" ]; then
+  echo "ERROR: AUTH_TOKEN environment variable is required"
+  echo "Usage: AUTH_TOKEN=your-token ./examples/test-api.sh"
+  exit 1
+fi
 
 echo "=== Testing homerun2-omni-pitcher API ==="
 echo ""
@@ -20,6 +29,7 @@ echo ""
 echo "2. Testing validation - empty payload..."
 curl -s -X POST "${BASE_URL}/pitch" \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ${AUTH_TOKEN}" \
   -d '{}' | python3 -m json.tool
 echo ""
 echo ""
@@ -28,6 +38,7 @@ echo ""
 echo "3. Testing validation - missing message..."
 curl -s -X POST "${BASE_URL}/pitch" \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ${AUTH_TOKEN}" \
   -d '{"title":"test"}' | python3 -m json.tool
 echo ""
 echo ""
@@ -36,6 +47,7 @@ echo ""
 echo "4. Testing valid request - minimal fields..."
 curl -s -X POST "${BASE_URL}/pitch" \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ${AUTH_TOKEN}" \
   -d '{
     "title": "Test Message",
     "message": "This is a test message"
@@ -47,6 +59,7 @@ echo ""
 echo "5. Testing valid request - all fields..."
 curl -s -X POST "${BASE_URL}/pitch" \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ${AUTH_TOKEN}" \
   -d '{
     "title": "Deployment Notification",
     "message": "Service xyz deployed successfully to production",
