@@ -1,6 +1,7 @@
 package pitcher
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log/slog"
@@ -8,6 +9,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/redis/go-redis/v9"
 	homerun "github.com/stuttgart-things/homerun-library"
 )
 
@@ -19,6 +21,20 @@ type Pitcher interface {
 // RedisPitcher enqueues messages into Redis Streams.
 type RedisPitcher struct {
 	Config homerun.RedisConfig
+}
+
+// HealthCheck pings Redis to verify connectivity.
+func (p *RedisPitcher) HealthCheck(ctx context.Context) error {
+	client := redis.NewClient(&redis.Options{
+		Addr:     p.Config.Addr + ":" + p.Config.Port,
+		Password: p.Config.Password,
+	})
+	defer client.Close()
+
+	if err := client.Ping(ctx).Err(); err != nil {
+		return fmt.Errorf("redis ping failed: %w", err)
+	}
+	return nil
 }
 
 func (p *RedisPitcher) Pitch(msg homerun.Message) (string, string, error) {
