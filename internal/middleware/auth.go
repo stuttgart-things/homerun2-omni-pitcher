@@ -45,5 +45,5 @@ func TokenAuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 func respondWithAuthError(w http.ResponseWriter, code int, message string) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
-	fmt.Fprintf(w, `{"status":"error","message":"%s"}`, message)
+	_, _ = fmt.Fprintf(w, `{"status":"error","message":"%s"}`, message)
 }
