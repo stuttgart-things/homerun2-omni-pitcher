@@ -1,3 +1,10 @@
+## [0.6.4](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v0.6.3...v0.6.4) (2026-03-07)
+
+
+### Bug Fixes
+
+* **deps:** update module github.com/redis/go-redis/v9 to v9.18.0 ([66110ab](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/66110abeffac0321215c3f301b43636c7cc56f4d))
+
 ## [0.6.3](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v0.6.2...v0.6.3) (2026-03-07)
 
 
