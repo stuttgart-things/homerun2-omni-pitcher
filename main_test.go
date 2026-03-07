@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	homerun "github.com/stuttgart-things/homerun-library"
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/handlers"
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/models"
 )
@@ -94,7 +95,7 @@ func TestPitchHandlerValidation(t *testing.T) {
 			req.Header.Set("Content-Type", "application/json")
 
 			rr := httptest.NewRecorder()
-			handler := http.HandlerFunc(handlers.PitchHandler)
+			handler := http.HandlerFunc(handlers.NewPitchHandler(homerun.RedisConfig{}))
 			handler.ServeHTTP(rr, req)
 
 			if status := rr.Code; status != tt.expectedStatus {
@@ -124,7 +125,7 @@ func TestPitchHandlerMethodNotAllowed(t *testing.T) {
 	}
 
 	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(handlers.PitchHandler)
+	handler := http.HandlerFunc(handlers.NewPitchHandler(homerun.RedisConfig{}))
 	handler.ServeHTTP(rr, req)
 
 	if status := rr.Code; status != http.StatusMethodNotAllowed {
