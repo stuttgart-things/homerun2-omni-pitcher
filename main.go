@@ -54,8 +54,32 @@ func main() {
 		slog.Info("pitcher mode: redis", "addr", redisConfig.Addr, "port", redisConfig.Port, "stream", redisConfig.Stream)
 	}
 
+	// Select auth middleware
+	authMode := homerun.GetEnv("AUTH_MODE", "token")
+	var authMiddleware func(http.HandlerFunc) http.HandlerFunc
+
+	switch authMode {
+	case "jwt":
+		jwksURL := homerun.GetEnv("JWT_JWKS_URL", "")
+		if jwksURL == "" {
+			slog.Error("JWT_JWKS_URL is required when AUTH_MODE=jwt")
+			os.Exit(1)
+		}
+		jwtMw, err := middleware.NewJWTAuthMiddleware(middleware.JWTConfig{
+			JWKSURL:  jwksURL,
+			Issuer:   homerun.GetEnv("JWT_ISSUER", ""),
+			Audience: homerun.GetEnv("JWT_AUDIENCE", ""),
+		})
+		if err != nil {
+			slog.Error("failed to initialize JWT auth", "error", err)
+			os.Exit(1)
+		}
+		authMiddleware = jwtMw
+	default:
+		authMiddleware = middleware.TokenAuthMiddleware
+	}
+
 	// Startup banner
-	authConfigured := homerun.GetEnv("AUTH_TOKEN", "") != ""
 	slog.Info("starting homerun2-omni-pitcher",
 		"version", version,
 		"commit", commit,
@@ -63,14 +87,14 @@ func main() {
 		"go", runtime.Version(),
 		"port", port,
 		"pitcher_mode", mode,
-		"auth_configured", authConfigured,
+		"auth_mode", authMode,
 	)
 
 	buildInfo := handlers.BuildInfo{Version: version, Commit: commit, Date: date}
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/health", handlers.NewHealthHandler(buildInfo))
-	mux.HandleFunc("/pitch", middleware.TokenAuthMiddleware(handlers.NewPitchHandler(p)))
+	mux.HandleFunc("/pitch", authMiddleware(handlers.NewPitchHandler(p)))
 
 	srv := &http.Server{
 		Addr:    ":" + port,
