@@ -1,3 +1,11 @@
+## [1.1.1](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.1.0...v1.1.1) (2026-03-07)
+
+
+### Bug Fixes
+
+* resolve staticcheck SA9003 empty branch in banner ([b336507](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/b336507876f0a825975e78fae03650a23a616f7d))
+* restyle banner with orange Street Fighter theme and bigger elements ([c08811e](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/c08811e8671e54fd9914a95f330143fffb78d20c))
+
 # [1.1.0](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.0.0...v1.1.0) (2026-03-07)
 
 
