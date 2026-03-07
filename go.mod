@@ -2,7 +2,7 @@ module github.com/stuttgart-things/homerun2-omni-pitcher
 
 go 1.24.2
 
-require github.com/stuttgart-things/homerun-library v1.2.1-0.20251122081303-7e9992b659a7
+require github.com/stuttgart-things/homerun-library v1.2.1-0.20260307074215-b54ec161e775
 
 require (
 	atomicgo.dev/cursor v0.2.0 // indirect
