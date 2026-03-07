@@ -1,3 +1,15 @@
+# [0.2.0](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v0.1.1...v0.2.0) (2026-03-07)
+
+
+### Bug Fixes
+
+* use safe defaults for ldflags env vars in ko config ([4157523](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/4157523600d6c2f7ccad3de08096d61571cc0bb8)), closes [#53](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/53)
+
+
+### Features
+
+* embed build info via ldflags (version, commit, date) ([e0d4b06](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/e0d4b06d85738e47c77c015b8aae58033468549a)), closes [#53](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/53)
+
 ## [0.1.1](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v0.1.0...v0.1.1) (2026-03-06)
 
 
