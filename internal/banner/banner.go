@@ -79,9 +79,7 @@ type model struct {
 // the final frame as a persistent header before returning.
 func Show() {
 	p := tea.NewProgram(initialModel(), tea.WithAltScreen())
-	if _, err := p.Run(); err != nil {
-		// Non-fatal: if banner fails, just print static.
-	}
+	_, _ = p.Run() // Non-fatal: if banner animation fails, we still print the header below
 	// Print the final banner as a persistent header for the running program
 	fmt.Println(renderHeader())
 }
