@@ -1,3 +1,11 @@
+## [0.3.2](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v0.3.1...v0.3.2) (2026-03-07)
+
+
+### Bug Fixes
+
+* adapt to homerun-library API change (RedisConfig struct) ([595cdf5](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/595cdf568f665de56b16a1319bea412a29e62b7f))
+* **deps:** update github.com/stuttgart-things/homerun-library digest to b54ec16 ([ab15762](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/ab15762de1de297b5b980bf80d2e295df65b45f3))
+
 ## [0.3.1](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v0.3.0...v0.3.1) (2026-03-07)
 
 
