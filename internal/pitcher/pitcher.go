@@ -29,7 +29,7 @@ func (p *RedisPitcher) HealthCheck(ctx context.Context) error {
 		Addr:     p.Config.Addr + ":" + p.Config.Port,
 		Password: p.Config.Password,
 	})
-	defer client.Close()
+	defer func() { _ = client.Close() }()
 
 	if err := client.Ping(ctx).Err(); err != nil {
 		return fmt.Errorf("redis ping failed: %w", err)
@@ -59,7 +59,7 @@ func (p *FilePitcher) Pitch(msg homerun.Message) (string, string, error) {
 	if err != nil {
 		return "", "", fmt.Errorf("failed to open pitch file: %w", err)
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 
 	objectID := fmt.Sprintf("file-%d", time.Now().UnixNano())
 	streamID := "file"
