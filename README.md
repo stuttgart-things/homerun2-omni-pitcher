@@ -2,9 +2,37 @@
 
 A Go web service that provides an HTTP API for pitching messages to Redis Streams using the [homerun-library](https://github.com/stuttgart-things/homerun-library).
 
-## DEV
+## Dev Mode (no Redis)
 
-## DEPLOYMENT
+Run the pitcher without Redis by using file mode — messages are written as JSON lines to a local file instead of being enqueued into Redis Streams:
+
+```bash
+PITCHER_MODE=file AUTH_TOKEN=test go run .
+```
+
+Pitched messages are appended to `pitched.log` by default. Override with `PITCHER_FILE`:
+
+```bash
+PITCHER_MODE=file PITCHER_FILE=my-output.log AUTH_TOKEN=test go run .
+```
+
+Test it:
+
+```bash
+# Health check
+curl http://localhost:8080/health
+
+# Pitch a message
+curl -X POST http://localhost:8080/pitch \
+  -H "Authorization: Bearer test" \
+  -H "Content-Type: application/json" \
+  -d '{"title": "test", "message": "hello from dev mode"}'
+
+# View pitched messages
+cat pitched.log | jq .
+```
+
+## Deployment
 
 ```bash
 helmfile apply -f \
@@ -30,10 +58,19 @@ The service is configured via environment variables:
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `PORT` | HTTP server port | `8080` |
+| `PITCHER_MODE` | Backend mode: `redis` or `file` | `redis` |
+| `PITCHER_FILE` | Output file path (only when `PITCHER_MODE=file`) | `pitched.log` |
 | `REDIS_ADDR` | Redis server address | `localhost` |
 | `REDIS_PORT` | Redis server port | `6379` |
 | `REDIS_PASSWORD` | Redis password | (empty) |
 | `REDIS_STREAM` | Redis stream name | `messages` |
+| `AUTH_MODE` | Auth mode: `token` or `jwt` | `token` |
+| `AUTH_TOKEN` | Bearer token (when `AUTH_MODE=token`) | (required) |
+| `JWT_JWKS_URL` | JWKS endpoint URL (when `AUTH_MODE=jwt`) | (required) |
+| `JWT_ISSUER` | Expected JWT issuer (when `AUTH_MODE=jwt`) | (empty) |
+| `JWT_AUDIENCE` | Expected JWT audience (when `AUTH_MODE=jwt`) | (empty) |
+| `LOG_FORMAT` | Log format: `json` or `text` | `json` |
+| `LOG_LEVEL` | Log level: `debug`, `info`, `warn`, `error` | `info` |
 
 ## Usage
 
@@ -66,6 +103,7 @@ Send a POST request to `/pitch` with a JSON payload:
 
 ```bash
 curl -X POST http://localhost:8080/pitch \
+  -H "Authorization: Bearer <YOUR_AUTH_TOKEN>" \
   -H "Content-Type: application/json" \
   -d '{
     "title": "Deployment Notification",
@@ -110,7 +148,7 @@ Response:
 ## API Endpoints
 
 - `GET /health` - Health check endpoint
-- `POST /pitch` - Submit a message to Redis Streams
+- `POST /pitch` - Submit a message (to Redis Streams or file, depending on `PITCHER_MODE`). Requires `Authorization: Bearer <token>` header.
 
 ## Examples
 
