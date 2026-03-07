@@ -10,6 +10,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/banner"
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/config"
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/handlers"
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/middleware"
@@ -26,6 +27,7 @@ var (
 )
 
 func main() {
+	banner.Show()
 	config.SetupLogging()
 
 	port := homerun.GetEnv("PORT", "8080")
