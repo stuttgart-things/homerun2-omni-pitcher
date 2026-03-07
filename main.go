@@ -74,7 +74,7 @@ func main() {
 
 	srv := &http.Server{
 		Addr:    ":" + port,
-		Handler: mux,
+		Handler: middleware.RequestLogging(mux),
 	}
 
 	// Start server in goroutine
