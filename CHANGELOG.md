@@ -1,3 +1,10 @@
+## [0.4.1](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v0.4.0...v0.4.1) (2026-03-07)
+
+
+### Bug Fixes
+
+* **deps:** update opentelemetry-go monorepo ([5606cb3](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/5606cb3e01d4bfe8a0db5a226df871a55f453816))
+
 # [0.4.0](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v0.3.2...v0.4.0) (2026-03-07)
 
 
