@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/redis/go-redis/v9"
-	homerun "github.com/stuttgart-things/homerun-library"
+	homerun "github.com/stuttgart-things/homerun-library/v2"
 )
 
 // Pitcher defines the interface for message delivery backends.

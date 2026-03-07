@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	homerun "github.com/stuttgart-things/homerun-library"
+	homerun "github.com/stuttgart-things/homerun-library/v2"
 )
 
 func LoadRedisConfig() homerun.RedisConfig {
