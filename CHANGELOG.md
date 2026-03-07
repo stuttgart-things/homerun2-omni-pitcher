@@ -1,3 +1,10 @@
+# [0.4.0](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v0.3.2...v0.4.0) (2026-03-07)
+
+
+### Features
+
+* introduce Pitcher interface with file-based dev mode ([f04a00a](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/f04a00a41fe5f6f72aeceb1daebd60b844a7ff1e)), closes [#47](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/47)
+
 ## [0.3.2](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v0.3.1...v0.3.2) (2026-03-07)
 
 
