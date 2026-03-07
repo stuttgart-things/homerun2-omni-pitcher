@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"runtime"
 	"syscall"
 	"time"
 
@@ -53,6 +54,18 @@ func main() {
 		slog.Info("pitcher mode: redis", "addr", redisConfig.Addr, "port", redisConfig.Port, "stream", redisConfig.Stream)
 	}
 
+	// Startup banner
+	authConfigured := homerun.GetEnv("AUTH_TOKEN", "") != ""
+	slog.Info("starting homerun2-omni-pitcher",
+		"version", version,
+		"commit", commit,
+		"date", date,
+		"go", runtime.Version(),
+		"port", port,
+		"pitcher_mode", mode,
+		"auth_configured", authConfigured,
+	)
+
 	buildInfo := handlers.BuildInfo{Version: version, Commit: commit, Date: date}
 
 	mux := http.NewServeMux()
@@ -66,13 +79,6 @@ func main() {
 
 	// Start server in goroutine
 	go func() {
-		slog.Info("starting server",
-			"app", "homerun2-omni-pitcher",
-			"version", version,
-			"commit", commit,
-			"date", date,
-			"port", port,
-		)
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			slog.Error("server error", "error", err)
 			os.Exit(1)
