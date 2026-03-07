@@ -1,3 +1,18 @@
+# [1.0.0](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v0.6.4...v1.0.0) (2026-03-07)
+
+
+* feat!: migrate to homerun-library/v2 import path ([38a869a](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/38a869a6a1a9b2ae7a8d68a1decac7ce6c8ed801)), closes [#9](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/9)
+
+
+### BREAKING CHANGES
+
+* import path changed from
+github.com/stuttgart-things/homerun-library to
+github.com/stuttgart-things/homerun-library/v2
+
+Update all Go source files to use the v2 import path.
+EnqueueMessageInRedisStreams now returns (objectID, streamID, error).
+
 ## [0.6.4](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v0.6.3...v0.6.4) (2026-03-07)
 
 
