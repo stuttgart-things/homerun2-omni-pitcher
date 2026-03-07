@@ -3,65 +3,74 @@ package handlers
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/models"
+	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/pitcher"
 	homerun "github.com/stuttgart-things/homerun-library"
 )
 
-// Note: Tests that validate successful message enqueuing require a live Redis instance
-// or mocking the homerun library. These tests focus on validation logic and error cases
-// that can be tested without Redis connectivity.
+// mockPitcher is a test pitcher that returns configurable results.
+type mockPitcher struct {
+	objectID string
+	streamID string
+	err      error
+}
+
+func (m *mockPitcher) Pitch(_ homerun.Message) (string, string, error) {
+	return m.objectID, m.streamID, m.err
+}
+
+// Compile-time check that mockPitcher implements Pitcher.
+var _ pitcher.Pitcher = (*mockPitcher)(nil)
 
 func TestPitchHandler(t *testing.T) {
+	successPitcher := &mockPitcher{objectID: "obj-1", streamID: "stream-1"}
+	failPitcher := &mockPitcher{err: fmt.Errorf("backend error")}
+
 	tests := []struct {
 		name           string
 		method         string
 		payload        interface{}
+		pitcher        pitcher.Pitcher
 		expectedStatus int
 		validateResp   func(t *testing.T, resp models.PitchResponse)
-		skipRedis      bool // Skip tests that require Redis
 	}{
 		{
 			name:           "Method not allowed - GET",
 			method:         http.MethodGet,
 			payload:        nil,
+			pitcher:        successPitcher,
 			expectedStatus: http.StatusMethodNotAllowed,
-			validateResp:   nil,
-			skipRedis:      true,
 		},
 		{
 			name:           "Method not allowed - PUT",
 			method:         http.MethodPut,
 			payload:        nil,
+			pitcher:        successPitcher,
 			expectedStatus: http.StatusMethodNotAllowed,
-			validateResp:   nil,
-			skipRedis:      true,
 		},
 		{
 			name:           "Method not allowed - DELETE",
 			method:         http.MethodDelete,
 			payload:        nil,
+			pitcher:        successPitcher,
 			expectedStatus: http.StatusMethodNotAllowed,
-			validateResp:   nil,
-			skipRedis:      true,
 		},
 		{
 			name:           "Invalid JSON payload",
 			method:         http.MethodPost,
 			payload:        "invalid-json",
+			pitcher:        successPitcher,
 			expectedStatus: http.StatusBadRequest,
 			validateResp: func(t *testing.T, resp models.PitchResponse) {
-				if resp.Status != "error" {
-					t.Errorf("expected status 'error', got '%s'", resp.Status)
-				}
 				if resp.Message != "Invalid JSON payload" {
 					t.Errorf("expected message 'Invalid JSON payload', got '%s'", resp.Message)
 				}
 			},
-			skipRedis: true,
 		},
 		{
 			name:   "Missing title",
@@ -69,16 +78,13 @@ func TestPitchHandler(t *testing.T) {
 			payload: homerun.Message{
 				Message: "test message",
 			},
+			pitcher:        successPitcher,
 			expectedStatus: http.StatusBadRequest,
 			validateResp: func(t *testing.T, resp models.PitchResponse) {
-				if resp.Status != "error" {
-					t.Errorf("expected status 'error', got '%s'", resp.Status)
-				}
 				if resp.Message != "Title is required" {
 					t.Errorf("expected message 'Title is required', got '%s'", resp.Message)
 				}
 			},
-			skipRedis: true,
 		},
 		{
 			name:   "Missing message",
@@ -86,52 +92,49 @@ func TestPitchHandler(t *testing.T) {
 			payload: homerun.Message{
 				Title: "test title",
 			},
+			pitcher:        successPitcher,
 			expectedStatus: http.StatusBadRequest,
 			validateResp: func(t *testing.T, resp models.PitchResponse) {
-				if resp.Status != "error" {
-					t.Errorf("expected status 'error', got '%s'", resp.Status)
-				}
 				if resp.Message != "Message is required" {
 					t.Errorf("expected message 'Message is required', got '%s'", resp.Message)
 				}
 			},
-			skipRedis: true,
 		},
 		{
-			name:   "Empty title",
-			method: http.MethodPost,
-			payload: homerun.Message{
-				Title:   "",
-				Message: "test message",
-			},
-			expectedStatus: http.StatusBadRequest,
-			validateResp: func(t *testing.T, resp models.PitchResponse) {
-				if resp.Status != "error" {
-					t.Errorf("expected status 'error', got '%s'", resp.Status)
-				}
-				if resp.Message != "Title is required" {
-					t.Errorf("expected message 'Title is required', got '%s'", resp.Message)
-				}
-			},
-			skipRedis: true,
-		},
-		{
-			name:   "Empty message",
+			name:   "Successful pitch",
 			method: http.MethodPost,
 			payload: homerun.Message{
 				Title:   "test title",
-				Message: "",
+				Message: "test message",
 			},
-			expectedStatus: http.StatusBadRequest,
+			pitcher:        successPitcher,
+			expectedStatus: http.StatusOK,
+			validateResp: func(t *testing.T, resp models.PitchResponse) {
+				if resp.Status != "success" {
+					t.Errorf("expected status 'success', got '%s'", resp.Status)
+				}
+				if resp.ObjectID != "obj-1" {
+					t.Errorf("expected objectID 'obj-1', got '%s'", resp.ObjectID)
+				}
+				if resp.StreamID != "stream-1" {
+					t.Errorf("expected streamID 'stream-1', got '%s'", resp.StreamID)
+				}
+			},
+		},
+		{
+			name:   "Backend failure",
+			method: http.MethodPost,
+			payload: homerun.Message{
+				Title:   "test title",
+				Message: "test message",
+			},
+			pitcher:        failPitcher,
+			expectedStatus: http.StatusServiceUnavailable,
 			validateResp: func(t *testing.T, resp models.PitchResponse) {
 				if resp.Status != "error" {
 					t.Errorf("expected status 'error', got '%s'", resp.Status)
 				}
-				if resp.Message != "Message is required" {
-					t.Errorf("expected message 'Message is required', got '%s'", resp.Message)
-				}
 			},
-			skipRedis: true,
 		},
 	}
 
@@ -156,7 +159,7 @@ func TestPitchHandler(t *testing.T) {
 			req.Header.Set("Content-Type", "application/json")
 
 			rr := httptest.NewRecorder()
-			handler := http.HandlerFunc(NewPitchHandler(homerun.RedisConfig{}))
+			handler := NewPitchHandler(tt.pitcher)
 			handler.ServeHTTP(rr, req)
 
 			if status := rr.Code; status != tt.expectedStatus {
@@ -175,110 +178,46 @@ func TestPitchHandler(t *testing.T) {
 	}
 }
 
-// Note: Default value testing and successful enqueue testing require
-// integration tests with a live Redis instance. See Dagger BuildAndTestBinary
-// for integration test coverage.
-
 func TestRespondWithError(t *testing.T) {
-	tests := []struct {
-		name     string
-		code     int
-		message  string
-		expected models.PitchResponse
-	}{
-		{
-			name:    "Bad request error",
-			code:    http.StatusBadRequest,
-			message: "Invalid input",
-			expected: models.PitchResponse{
-				Status:  "error",
-				Message: "Invalid input",
-			},
-		},
-		{
-			name:    "Internal server error",
-			code:    http.StatusInternalServerError,
-			message: "Something went wrong",
-			expected: models.PitchResponse{
-				Status:  "error",
-				Message: "Something went wrong",
-			},
-		},
+	rr := httptest.NewRecorder()
+	respondWithError(rr, http.StatusBadRequest, "Invalid input")
+
+	if rr.Code != http.StatusBadRequest {
+		t.Errorf("expected status %d, got %d", http.StatusBadRequest, rr.Code)
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			rr := httptest.NewRecorder()
-			respondWithError(rr, tt.code, tt.message)
+	var response models.PitchResponse
+	if err := json.Unmarshal(rr.Body.Bytes(), &response); err != nil {
+		t.Fatalf("could not unmarshal response: %v", err)
+	}
 
-			if status := rr.Code; status != tt.code {
-				t.Errorf("handler returned wrong status code: got %v want %v", status, tt.code)
-			}
-
-			var response models.PitchResponse
-			if err := json.Unmarshal(rr.Body.Bytes(), &response); err != nil {
-				t.Errorf("could not unmarshal response: %v", err)
-				return
-			}
-
-			if response.Status != tt.expected.Status {
-				t.Errorf("expected status '%s', got '%s'", tt.expected.Status, response.Status)
-			}
-
-			if response.Message != tt.expected.Message {
-				t.Errorf("expected message '%s', got '%s'", tt.expected.Message, response.Message)
-			}
-		})
+	if response.Status != "error" || response.Message != "Invalid input" {
+		t.Errorf("unexpected response: %+v", response)
 	}
 }
 
 func TestRespondWithJSON(t *testing.T) {
-	tests := []struct {
-		name           string
-		code           int
-		payload        interface{}
-		expectedStatus int
-	}{
-		{
-			name: "Success response",
-			code: http.StatusOK,
-			payload: models.PitchResponse{
-				ObjectID: "test-object-id",
-				StreamID: "test-stream-id",
-				Status:   "success",
-				Message:  "Test message",
-			},
-			expectedStatus: http.StatusOK,
-		},
-		{
-			name: "Created response",
-			code: http.StatusCreated,
-			payload: models.PitchResponse{
-				Status:  "success",
-				Message: "Resource created",
-			},
-			expectedStatus: http.StatusCreated,
-		},
+	rr := httptest.NewRecorder()
+	respondWithJSON(rr, http.StatusOK, models.PitchResponse{
+		ObjectID: "test-id",
+		Status:   "success",
+		Message:  "ok",
+	})
+
+	if rr.Code != http.StatusOK {
+		t.Errorf("expected status %d, got %d", http.StatusOK, rr.Code)
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			rr := httptest.NewRecorder()
-			respondWithJSON(rr, tt.code, tt.payload)
+	if ct := rr.Header().Get("Content-Type"); ct != "application/json" {
+		t.Errorf("expected Content-Type 'application/json', got '%s'", ct)
+	}
 
-			if status := rr.Code; status != tt.expectedStatus {
-				t.Errorf("handler returned wrong status code: got %v want %v", status, tt.expectedStatus)
-			}
+	var response models.PitchResponse
+	if err := json.Unmarshal(rr.Body.Bytes(), &response); err != nil {
+		t.Fatalf("could not unmarshal response: %v", err)
+	}
 
-			contentType := rr.Header().Get("Content-Type")
-			if contentType != "application/json" {
-				t.Errorf("expected Content-Type 'application/json', got '%s'", contentType)
-			}
-
-			var response models.PitchResponse
-			if err := json.Unmarshal(rr.Body.Bytes(), &response); err != nil {
-				t.Errorf("could not unmarshal response: %v", err)
-			}
-		})
+	if response.ObjectID != "test-id" {
+		t.Errorf("expected objectID 'test-id', got '%s'", response.ObjectID)
 	}
 }

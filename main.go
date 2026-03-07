@@ -12,6 +12,7 @@ import (
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/config"
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/handlers"
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/middleware"
+	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/pitcher"
 
 	homerun "github.com/stuttgart-things/homerun-library"
 )
@@ -27,14 +28,26 @@ func main() {
 	config.SetupLogging()
 
 	port := homerun.GetEnv("PORT", "8080")
+	mode := homerun.GetEnv("PITCHER_MODE", "redis")
 
-	// Load config once at startup
-	redisConfig := config.LoadRedisConfig()
+	// Select pitcher backend
+	var p pitcher.Pitcher
+	switch mode {
+	case "file":
+		filePath := homerun.GetEnv("PITCHER_FILE", "pitched.log")
+		p = &pitcher.FilePitcher{Path: filePath}
+		slog.Info("pitcher mode: file", "path", filePath)
+	default:
+		redisConfig := config.LoadRedisConfig()
+		p = &pitcher.RedisPitcher{Config: redisConfig}
+		slog.Info("pitcher mode: redis", "addr", redisConfig.Addr, "port", redisConfig.Port, "stream", redisConfig.Stream)
+	}
+
 	buildInfo := handlers.BuildInfo{Version: version, Commit: commit, Date: date}
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/health", handlers.NewHealthHandler(buildInfo))
-	mux.HandleFunc("/pitch", middleware.TokenAuthMiddleware(handlers.NewPitchHandler(redisConfig)))
+	mux.HandleFunc("/pitch", middleware.TokenAuthMiddleware(handlers.NewPitchHandler(p)))
 
 	srv := &http.Server{
 		Addr:    ":" + port,

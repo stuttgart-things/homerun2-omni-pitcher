@@ -7,75 +7,65 @@ import (
 	"time"
 
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/models"
+	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/pitcher"
 
 	homerun "github.com/stuttgart-things/homerun-library"
 )
 
-// NewPitchHandler creates a PitchHandler with the given Redis config
-func NewPitchHandler(redisConfig homerun.RedisConfig) http.HandlerFunc {
+// NewPitchHandler creates a pitch handler with the given Pitcher backend.
+func NewPitchHandler(p pitcher.Pitcher) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		PitchHandlerWithConfig(w, r, redisConfig)
-	}
-}
+		if r.Method != http.MethodPost {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
 
-func PitchHandlerWithConfig(w http.ResponseWriter, r *http.Request, redisConfig homerun.RedisConfig) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
+		var msg homerun.Message
+		if err := json.NewDecoder(r.Body).Decode(&msg); err != nil {
+			respondWithError(w, http.StatusBadRequest, "Invalid JSON payload")
+			return
+		}
 
-	var msg homerun.Message
-	if err := json.NewDecoder(r.Body).Decode(&msg); err != nil {
-		respondWithError(w, http.StatusBadRequest, "Invalid JSON payload")
-		return
-	}
+		// Validate required fields
+		if msg.Title == "" {
+			respondWithError(w, http.StatusBadRequest, "Title is required")
+			return
+		}
+		if msg.Message == "" {
+			respondWithError(w, http.StatusBadRequest, "Message is required")
+			return
+		}
 
-	// Validate required fields
-	if msg.Title == "" {
-		respondWithError(w, http.StatusBadRequest, "Title is required")
-		return
-	}
-	if msg.Message == "" {
-		respondWithError(w, http.StatusBadRequest, "Message is required")
-		return
-	}
+		// Set defaults for optional fields
+		if msg.Severity == "" {
+			msg.Severity = "info"
+		}
+		if msg.Author == "" {
+			msg.Author = "unknown"
+		}
+		if msg.Timestamp == "" {
+			msg.Timestamp = time.Now().Format(time.RFC3339)
+		}
+		if msg.System == "" {
+			msg.System = "homerun2-omni-pitcher"
+		}
 
-	// Set defaults for optional fields
-	if msg.Severity == "" {
-		msg.Severity = "info"
-	}
-	if msg.Author == "" {
-		msg.Author = "unknown"
-	}
-	if msg.Timestamp == "" {
-		msg.Timestamp = time.Now().Format(time.RFC3339)
-	}
-	if msg.System == "" {
-		msg.System = "homerun2-omni-pitcher"
-	}
+		objectID, streamID, err := p.Pitch(msg)
+		if err != nil {
+			slog.Error("failed to pitch message", "error", err)
+			respondWithError(w, http.StatusServiceUnavailable, "Failed to enqueue message")
+			return
+		}
 
-	// Enqueue message in Redis Streams
-	objectID, streamID := homerun.EnqueueMessageInRedisStreams(
-		msg,
-		redisConfig,
-	)
+		respondWithJSON(w, http.StatusOK, models.PitchResponse{
+			ObjectID: objectID,
+			StreamID: streamID,
+			Status:   "success",
+			Message:  "Message successfully enqueued",
+		})
 
-	// Check if enqueue failed (empty objectID indicates failure)
-	if objectID == "" {
-		slog.Error("failed to enqueue message to Redis stream")
-		respondWithError(w, http.StatusServiceUnavailable, "Failed to enqueue message to Redis")
-		return
+		slog.Info("message pitched", "objectID", objectID, "streamID", streamID)
 	}
-
-	// Respond with success
-	respondWithJSON(w, http.StatusOK, models.PitchResponse{
-		ObjectID: objectID,
-		StreamID: streamID,
-		Status:   "success",
-		Message:  "Message successfully enqueued",
-	})
-
-	slog.Info("message pitched", "objectID", objectID, "streamID", streamID)
 }
 
 func respondWithError(w http.ResponseWriter, code int, message string) {
@@ -85,7 +75,7 @@ func respondWithError(w http.ResponseWriter, code int, message string) {
 	})
 }
 
-func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
+func respondWithJSON(w http.ResponseWriter, code int, payload any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
 	if err := json.NewEncoder(w).Encode(payload); err != nil {
