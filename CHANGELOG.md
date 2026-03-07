@@ -1,3 +1,10 @@
+# [0.3.0](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v0.2.0...v0.3.0) (2026-03-07)
+
+
+### Features
+
+* switch to log/slog for structured, leveled logging ([b45255a](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/b45255aaf21506b720dd8da44cb3d23fc916a0fd)), closes [#50](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/50)
+
 # [0.2.0](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v0.1.1...v0.2.0) (2026-03-07)
 
 
