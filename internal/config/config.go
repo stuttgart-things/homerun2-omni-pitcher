@@ -1,6 +1,12 @@
 package config
 
-import homerun "github.com/stuttgart-things/homerun-library"
+import (
+	"log/slog"
+	"os"
+	"strings"
+
+	homerun "github.com/stuttgart-things/homerun-library"
+)
 
 type RedisConfig struct {
 	Addr     string
@@ -25,4 +31,33 @@ func (c RedisConfig) ToMap() map[string]string {
 		"password": c.Password,
 		"stream":   c.Stream,
 	}
+}
+
+// SetupLogging configures slog as the default logger based on LOG_FORMAT and LOG_LEVEL env vars.
+func SetupLogging() {
+	format := strings.ToLower(homerun.GetEnv("LOG_FORMAT", "json"))
+	levelStr := strings.ToLower(homerun.GetEnv("LOG_LEVEL", "info"))
+
+	var level slog.Level
+	switch levelStr {
+	case "debug":
+		level = slog.LevelDebug
+	case "warn":
+		level = slog.LevelWarn
+	case "error":
+		level = slog.LevelError
+	default:
+		level = slog.LevelInfo
+	}
+
+	opts := &slog.HandlerOptions{Level: level}
+
+	var handler slog.Handler
+	if format == "text" {
+		handler = slog.NewTextHandler(os.Stdout, opts)
+	} else {
+		handler = slog.NewJSONHandler(os.Stdout, opts)
+	}
+
+	slog.SetDefault(slog.New(handler))
 }

@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
-	"log"
+	"log/slog"
 	"net/http"
 	"time"
 
@@ -68,7 +68,7 @@ func PitchHandlerWithConfig(w http.ResponseWriter, r *http.Request, redisConfig 
 
 	// Check if enqueue failed (empty objectID indicates failure)
 	if objectID == "" {
-		log.Printf("Failed to enqueue message to Redis stream")
+		slog.Error("failed to enqueue message to Redis stream")
 		respondWithError(w, http.StatusServiceUnavailable, "Failed to enqueue message to Redis")
 		return
 	}
@@ -81,7 +81,7 @@ func PitchHandlerWithConfig(w http.ResponseWriter, r *http.Request, redisConfig 
 		Message:  "Message successfully enqueued",
 	})
 
-	log.Printf("Message pitched: objectID=%s, streamID=%s", objectID, streamID)
+	slog.Info("message pitched", "objectID", objectID, "streamID", streamID)
 }
 
 func respondWithError(w http.ResponseWriter, code int, message string) {
@@ -95,6 +95,6 @@ func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
 	if err := json.NewEncoder(w).Encode(payload); err != nil {
-		log.Printf("Error encoding response: %v", err)
+		slog.Error("error encoding response", "error", err)
 	}
 }

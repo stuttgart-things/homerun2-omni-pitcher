@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
@@ -24,6 +24,8 @@ var (
 )
 
 func main() {
+	config.SetupLogging()
+
 	port := homerun.GetEnv("PORT", "8080")
 
 	// Load config once at startup
@@ -41,9 +43,16 @@ func main() {
 
 	// Start server in goroutine
 	go func() {
-		log.Printf("Starting homerun2-omni-pitcher %s (%s, %s) on port %s", version, commit, date, port)
+		slog.Info("starting server",
+			"app", "homerun2-omni-pitcher",
+			"version", version,
+			"commit", commit,
+			"date", date,
+			"port", port,
+		)
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("Server error: %v", err)
+			slog.Error("server error", "error", err)
+			os.Exit(1)
 		}
 	}()
 
@@ -52,14 +61,15 @@ func main() {
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 
-	log.Println("Shutting down server...")
+	slog.Info("shutting down server")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
 	if err := srv.Shutdown(ctx); err != nil {
-		log.Fatalf("Server forced to shutdown: %v", err)
+		slog.Error("server forced to shutdown", "error", err)
+		os.Exit(1)
 	}
 
-	log.Println("Server exited gracefully")
+	slog.Info("server exited gracefully")
 }
