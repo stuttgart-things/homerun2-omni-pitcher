@@ -6,25 +6,19 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/config"
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/models"
 
 	homerun "github.com/stuttgart-things/homerun-library"
 )
 
 // NewPitchHandler creates a PitchHandler with the given Redis config
-func NewPitchHandler(redisConfig config.RedisConfig) http.HandlerFunc {
+func NewPitchHandler(redisConfig homerun.RedisConfig) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		PitchHandlerWithConfig(w, r, redisConfig)
 	}
 }
 
-func PitchHandler(w http.ResponseWriter, r *http.Request) {
-	redisConfig := config.LoadRedisConfig()
-	PitchHandlerWithConfig(w, r, redisConfig)
-}
-
-func PitchHandlerWithConfig(w http.ResponseWriter, r *http.Request, redisConfig config.RedisConfig) {
+func PitchHandlerWithConfig(w http.ResponseWriter, r *http.Request, redisConfig homerun.RedisConfig) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
@@ -63,7 +57,7 @@ func PitchHandlerWithConfig(w http.ResponseWriter, r *http.Request, redisConfig 
 	// Enqueue message in Redis Streams
 	objectID, streamID := homerun.EnqueueMessageInRedisStreams(
 		msg,
-		redisConfig.ToMap(),
+		redisConfig,
 	)
 
 	// Check if enqueue failed (empty objectID indicates failure)

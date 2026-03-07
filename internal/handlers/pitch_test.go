@@ -156,7 +156,7 @@ func TestPitchHandler(t *testing.T) {
 			req.Header.Set("Content-Type", "application/json")
 
 			rr := httptest.NewRecorder()
-			handler := http.HandlerFunc(PitchHandler)
+			handler := http.HandlerFunc(NewPitchHandler(homerun.RedisConfig{}))
 			handler.ServeHTTP(rr, req)
 
 			if status := rr.Code; status != tt.expectedStatus {
