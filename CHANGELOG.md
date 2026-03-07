@@ -1,3 +1,12 @@
+## [0.6.3](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v0.6.2...v0.6.3) (2026-03-07)
+
+
+### Bug Fixes
+
+* adapt to homerun-library API change (EnqueueMessageInRedisStreams returns error) ([3955ba8](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/3955ba8583ac6c75c69047ca4b754da9fbbb9301))
+* **deps:** update github.com/stuttgart-things/homerun-library digest to beb8acc ([71d2fe4](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/71d2fe45f2a1d25e3fbc30ba03d7428cfc629e86))
+* **deps:** update module dagger.io/dagger to v0.20.1 ([2069a69](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/2069a6915972cbfaed67b6bc5fbecba14e4e9fda))
+
 ## [0.6.2](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v0.6.1...v0.6.2) (2026-03-07)
 
 
