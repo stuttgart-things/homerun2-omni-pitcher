@@ -1,3 +1,10 @@
+# [0.6.0](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v0.5.0...v0.6.0) (2026-03-07)
+
+
+### Features
+
+* JWT auth option with JWKS validation ([1670326](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/1670326f2cfb2ab4c397a0313b2bde68e39f1415)), closes [#52](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/52)
+
 # [0.5.0](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v0.4.1...v0.5.0) (2026-03-07)
 
 
