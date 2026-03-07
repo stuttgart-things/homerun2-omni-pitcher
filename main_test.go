@@ -18,7 +18,7 @@ func TestHealthHandler(t *testing.T) {
 	}
 
 	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(handlers.HealthHandler)
+	handler := http.HandlerFunc(handlers.NewHealthHandler(handlers.BuildInfo{Version: "test", Commit: "abc123", Date: "2026-01-01"}))
 	handler.ServeHTTP(rr, req)
 
 	if status := rr.Code; status != http.StatusOK {
@@ -33,6 +33,14 @@ func TestHealthHandler(t *testing.T) {
 	if response["status"] != "healthy" {
 		t.Errorf("expected status to be 'healthy', got '%s'", response["status"])
 	}
+
+	if response["version"] != "test" {
+		t.Errorf("expected version to be 'test', got '%s'", response["version"])
+	}
+
+	if response["commit"] != "abc123" {
+		t.Errorf("expected commit to be 'abc123', got '%s'", response["commit"])
+	}
 }
 
 func TestHealthHandlerMethodNotAllowed(t *testing.T) {
@@ -42,7 +50,7 @@ func TestHealthHandlerMethodNotAllowed(t *testing.T) {
 	}
 
 	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(handlers.HealthHandler)
+	handler := http.HandlerFunc(handlers.NewHealthHandler(handlers.BuildInfo{Version: "test", Commit: "abc123", Date: "2026-01-01"}))
 	handler.ServeHTTP(rr, req)
 
 	if status := rr.Code; status != http.StatusMethodNotAllowed {

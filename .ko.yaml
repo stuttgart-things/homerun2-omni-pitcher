@@ -7,3 +7,6 @@ builds:
     ldflags:
       - -s
       - -w
+      - -X main.version={{.Env.VERSION}}
+      - -X main.commit={{.Env.COMMIT}}
+      - -X main.date={{.Env.DATE}}

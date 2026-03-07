@@ -16,14 +16,22 @@ import (
 	homerun "github.com/stuttgart-things/homerun-library"
 )
 
+// Build-time variables set via ldflags
+var (
+	version = "dev"
+	commit  = "unknown"
+	date    = "unknown"
+)
+
 func main() {
 	port := homerun.GetEnv("PORT", "8080")
 
 	// Load config once at startup
 	redisConfig := config.LoadRedisConfig()
+	buildInfo := handlers.BuildInfo{Version: version, Commit: commit, Date: date}
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/health", handlers.HealthHandler)
+	mux.HandleFunc("/health", handlers.NewHealthHandler(buildInfo))
 	mux.HandleFunc("/pitch", middleware.TokenAuthMiddleware(handlers.NewPitchHandler(redisConfig)))
 
 	srv := &http.Server{
@@ -33,7 +41,7 @@ func main() {
 
 	// Start server in goroutine
 	go func() {
-		log.Printf("Starting homerun2-omni-pitcher on port %s", port)
+		log.Printf("Starting homerun2-omni-pitcher %s (%s, %s) on port %s", version, commit, date, port)
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("Server error: %v", err)
 		}
