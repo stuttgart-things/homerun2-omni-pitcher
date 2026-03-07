@@ -39,7 +39,17 @@ func main() {
 		slog.Info("pitcher mode: file", "path", filePath)
 	default:
 		redisConfig := config.LoadRedisConfig()
-		p = &pitcher.RedisPitcher{Config: redisConfig}
+		rp := &pitcher.RedisPitcher{Config: redisConfig}
+
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		if err := rp.HealthCheck(ctx); err != nil {
+			slog.Error("redis health check failed", "error", err, "addr", redisConfig.Addr, "port", redisConfig.Port)
+			cancel()
+			os.Exit(1)
+		}
+		cancel()
+
+		p = rp
 		slog.Info("pitcher mode: redis", "addr", redisConfig.Addr, "port", redisConfig.Port, "stream", redisConfig.Stream)
 	}
 

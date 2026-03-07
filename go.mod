@@ -2,7 +2,10 @@ module github.com/stuttgart-things/homerun2-omni-pitcher
 
 go 1.24.2
 
-require github.com/stuttgart-things/homerun-library v1.2.1-0.20260307074215-b54ec161e775
+require (
+	github.com/redis/go-redis/v9 v9.7.0
+	github.com/stuttgart-things/homerun-library v1.2.1-0.20260307074215-b54ec161e775
+)
 
 require (
 	atomicgo.dev/cursor v0.2.0 // indirect
@@ -145,7 +148,6 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/planetscale/vtprotobuf v0.6.1-0.20240319094008-0393e58bdf10 // indirect
 	github.com/pterm/pterm v0.12.82 // indirect
-	github.com/redis/go-redis/v9 v9.7.0 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/rs/xid v1.6.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
