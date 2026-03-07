@@ -1,3 +1,10 @@
+## [0.6.2](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v0.6.1...v0.6.2) (2026-03-07)
+
+
+### Bug Fixes
+
+* handle errcheck for Close() calls in pitcher ([ed1a197](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/ed1a1976bab3ec432e1bd99da0217bc52974fe92))
+
 ## [0.6.1](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v0.6.0...v0.6.1) (2026-03-07)
 
 
