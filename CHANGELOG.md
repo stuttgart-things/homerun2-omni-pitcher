@@ -1,3 +1,12 @@
+# [0.5.0](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v0.4.1...v0.5.0) (2026-03-07)
+
+
+### Features
+
+* HTTP request logging middleware ([24a8cce](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/24a8cce08438a8bd414deb70f0a3cb86f71d29be)), closes [#51](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/51)
+* Redis health check at startup (fail fast) ([608795a](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/608795aadb2fdb30f608edae6fb5c713393731cf)), closes [#48](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/48)
+* startup banner with version, config, and connection status ([7d7137a](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/7d7137acf61d264b5558b59b1d4999abb195efce)), closes [#49](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/49)
+
 ## [0.4.1](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v0.4.0...v0.4.1) (2026-03-07)
 
 
