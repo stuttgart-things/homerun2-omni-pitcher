@@ -15,7 +15,7 @@ import (
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/middleware"
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/pitcher"
 
-	homerun "github.com/stuttgart-things/homerun-library"
+	homerun "github.com/stuttgart-things/homerun-library/v2"
 )
 
 // Build-time variables set via ldflags

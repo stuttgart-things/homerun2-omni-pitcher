@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	homerun "github.com/stuttgart-things/homerun-library"
+	homerun "github.com/stuttgart-things/homerun-library/v2"
 )
 
 func TestFilePitcher(t *testing.T) {
