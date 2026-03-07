@@ -1,3 +1,10 @@
+## [0.6.1](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v0.6.0...v0.6.1) (2026-03-07)
+
+
+### Bug Fixes
+
+* **deps:** update module github.com/vektah/gqlparser/v2 to v2.5.32 ([7bb27ff](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/7bb27ffec0b72ba8d93bafa64eab4b588b6a2969))
+
 # [0.6.0](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v0.5.0...v0.6.0) (2026-03-07)
 
 
