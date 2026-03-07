@@ -6,7 +6,7 @@ require (
 	github.com/MicahParks/keyfunc/v3 v3.8.0
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/redis/go-redis/v9 v9.18.0
-	github.com/stuttgart-things/homerun-library v1.2.1-0.20260307154301-beb8acceefd9
+	github.com/stuttgart-things/homerun-library v1.2.1-0.20260307161945-733c4cf7f113
 )
 
 require (
