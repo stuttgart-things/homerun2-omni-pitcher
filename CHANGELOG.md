@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.0.0...v1.1.0) (2026-03-07)
+
+
+### Features
+
+* animated retro Bubble Tea banner with HOMERUN2 branding ([b82912d](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/b82912d619c7a0aff24dcf6b93fb98f196e4bc69)), closes [#69](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/69)
+
 # [1.0.0](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v0.6.4...v1.0.0) (2026-03-07)
 
 
