@@ -5,7 +5,7 @@ go 1.24.2
 require (
 	github.com/MicahParks/keyfunc/v3 v3.8.0
 	github.com/charmbracelet/bubbletea v1.3.10
-	github.com/charmbracelet/lipgloss v1.1.0
+	github.com/charmbracelet/lipgloss/v2 v2.0.0
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/redis/go-redis/v9 v9.18.0
 	github.com/stuttgart-things/homerun-library/v2 v2.0.1-0.20260307163657-17be19573fe0
