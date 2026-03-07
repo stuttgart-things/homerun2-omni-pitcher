@@ -1,3 +1,10 @@
+## [0.3.1](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v0.3.0...v0.3.1) (2026-03-07)
+
+
+### Bug Fixes
+
+* handle errcheck lint failures in auth middleware ([d4388b2](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/d4388b2e775edd7a71836b17161ec2418130ca92))
+
 # [0.3.0](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v0.2.0...v0.3.0) (2026-03-07)
 
 
