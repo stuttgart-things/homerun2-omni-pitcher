@@ -38,9 +38,9 @@ func (p *RedisPitcher) HealthCheck(ctx context.Context) error {
 }
 
 func (p *RedisPitcher) Pitch(msg homerun.Message) (string, string, error) {
-	objectID, streamID := homerun.EnqueueMessageInRedisStreams(msg, p.Config)
-	if objectID == "" {
-		return "", "", fmt.Errorf("failed to enqueue message to Redis stream")
+	objectID, streamID, err := homerun.EnqueueMessageInRedisStreams(msg, p.Config)
+	if err != nil {
+		return "", "", fmt.Errorf("failed to enqueue message to Redis stream: %w", err)
 	}
 	return objectID, streamID, nil
 }
