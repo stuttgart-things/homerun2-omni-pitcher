@@ -17,53 +17,51 @@ const bannerText = `██╗  ██╗ ██████╗ ███╗   �
 ██║  ██║╚██████╔╝██║ ╚═╝ ██║███████╗██║  ██║╚██████╔╝██║ ╚████║
 ╚═╝  ╚═╝ ╚═════╝ ╚═╝     ╚═╝╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═══╝`
 
-const superscript2 = `██████╗
-     ██║
-█████╔╝
-╚═══██╗
-█████╔╝
-╚════╝`
+const serviceText = ` ██████╗ ███╗   ███╗███╗   ██╗██╗      ██████╗ ██╗████████╗ ██████╗██╗  ██╗███████╗██████╗
+██╔═══██╗████╗ ████║████╗  ██║██║      ██╔══██╗██║╚══██╔══╝██╔════╝██║  ██║██╔════╝██╔══██╗
+██║   ██║██╔████╔██║██╔██╗ ██║██║█████╗██████╔╝██║   ██║   ██║     ███████║█████╗  ██████╔╝
+██║   ██║██║╚██╔╝██║██║╚██╗██║██║╚════╝██╔═══╝ ██║   ██║   ██║     ██╔══██║██╔══╝  ██╔══██╗
+╚██████╔╝██║ ╚═╝ ██║██║ ╚████║██║      ██║     ██║   ██║   ╚██████╗██║  ██║███████╗██║  ██║
+ ╚═════╝ ╚═╝     ╚═╝╚═╝  ╚═══╝╚═╝      ╚═╝     ╚═╝   ╚═╝    ╚═════╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝`
 
-var services = []string{
-	"omni-pitcher",
-	"cluster-scout",
-	"kube-slugger",
-	"homerun-ui",
+// Bigger baseball art for the animation.
+var baseballArt = []string{
+	"    ___     ",
+	"  /     \\   ",
+	" | () () |  ",
+	"  \\ ___ /   ",
+	"    ~~~     ",
 }
 
-// Baseball animation frames — ball traveling across the field.
-var baseballFrames = []string{
-	"  ⚾                                                          ",
-	"       ⚾                                                     ",
-	"            ⚾                                                ",
-	"                 ⚾                                           ",
-	"                      ⚾                                      ",
-	"                           ⚾                                 ",
-	"                                ⚾                            ",
-	"                                     ⚾                       ",
-	"                                          ⚾                  ",
-	"                                               ⚾             ",
-	"                                                    ⚾        ",
-	"                                                         ⚾   ",
-}
+const fieldWidth = 70
 
 // Glitch characters used during the intro phase.
 const glitchChars = "░▒▓█▄▀▐▌╠╣╬═║╗╝╚╔"
 
 var (
-	greenGlow = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("#39FF14")).
+	// Orange gradient — Street Fighter style
+	orangeHot = lipgloss.NewStyle().
+			Foreground(lipgloss.Color("#FF6600")).
 			Bold(true)
 
-	dimGreen = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("#1a8a0e"))
+	orangeBright = lipgloss.NewStyle().
+			Foreground(lipgloss.Color("#FF9900")).
+			Bold(true)
 
-	brightWhite = lipgloss.NewStyle().
+	dimOrange = lipgloss.NewStyle().
+			Foreground(lipgloss.Color("#994400"))
+
+	// The "2" in a contrasting yellow/white
+	accentStyle = lipgloss.NewStyle().
+			Foreground(lipgloss.Color("#FFCC00")).
+			Bold(true)
+
+	serviceBlockStyle = lipgloss.NewStyle().
+				Foreground(lipgloss.Color("#FF4400")).
+				Bold(true)
+
+	ballStyle = lipgloss.NewStyle().
 			Foreground(lipgloss.Color("#FFFFFF")).
-			Bold(true)
-
-	serviceStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("#00FFFF")).
 			Bold(true)
 )
 
@@ -72,20 +70,18 @@ type tickMsg time.Time
 type model struct {
 	width        int
 	frame        int
-	serviceIdx   int
 	glitchPhase  bool
 	glitchFrames int
 	done         bool
 }
 
-// Show displays the animated banner for a brief duration, then returns.
-// The banner runs for approximately 4 seconds.
+// Show displays the animated banner for a brief duration, then prints
+// the final frame as a persistent header before returning.
 func Show() {
 	p := tea.NewProgram(initialModel(), tea.WithAltScreen())
-	if _, err := p.Run(); err != nil {
-		// Non-fatal: if banner fails, just skip it.
-		fmt.Println(greenGlow.Render(renderStatic()))
-	}
+	_, _ = p.Run() // Non-fatal: if banner animation fails, we still print the header below
+	// Print the final banner as a persistent header for the running program
+	fmt.Println(renderHeader())
 }
 
 func initialModel() model {
@@ -129,11 +125,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tickCmd()
 		}
 
-		// Rotate services every ~2 seconds (20 frames)
-		if m.frame%20 == 0 {
-			m.serviceIdx = (m.serviceIdx + 1) % len(services)
-		}
-
 		// Auto-quit after ~4 seconds total (40 frames)
 		if m.frame >= 40 {
 			m.done = true
@@ -153,50 +144,46 @@ func (m model) View() string {
 
 	var b strings.Builder
 
-	// Render banner
+	// Render HOMERUN banner
 	var bannerOutput string
 	if m.glitchPhase {
 		bannerOutput = glitchText(bannerText, m.glitchFrames)
 	} else {
-		bannerOutput = greenGlow.Render(bannerText)
+		bannerOutput = orangeHot.Render(bannerText)
 	}
 
-	// Render superscript 2
-	var sup2Output string
-	if m.glitchPhase {
-		sup2Output = glitchText(superscript2, m.glitchFrames)
-	} else {
-		sup2Output = brightWhite.Render(superscript2)
+	b.WriteString(bannerOutput)
+
+	// Append "2" on the same last line, in accent color
+	the2 := accentStyle.Render("2")
+	if m.glitchPhase && m.glitchFrames < 8 {
+		glitchRunes := []rune(glitchChars)
+		the2 = accentStyle.Render(string(glitchRunes[rand.IntN(len(glitchRunes))]))
 	}
+	b.WriteString(the2)
+	b.WriteString("\n\n")
 
-	// Compose banner + superscript side by side
-	bannerLines := strings.Split(bannerOutput, "\n")
-	sup2Lines := strings.Split(sup2Output, "\n")
-
-	for i, line := range bannerLines {
-		b.WriteString(line)
-		if i < len(sup2Lines) {
-			b.WriteString(" ")
-			b.WriteString(sup2Lines[i])
+	// Baseball animation — bigger ball sliding across
+	if !m.glitchPhase {
+		ballPos := (m.frame * 3) % fieldWidth
+		for _, artLine := range baseballArt {
+			pad := strings.Repeat(" ", ballPos)
+			b.WriteString(ballStyle.Render(pad + artLine))
+			b.WriteString("\n")
 		}
 		b.WriteString("\n")
-	}
-
-	b.WriteString("\n")
-
-	// Baseball animation
-	if !m.glitchPhase {
-		ballIdx := m.frame % len(baseballFrames)
-		b.WriteString(dimGreen.Render(baseballFrames[ballIdx]))
-		b.WriteString("\n\n")
 	} else {
 		b.WriteString("\n\n")
 	}
 
-	// Service display
-	svc := services[m.serviceIdx]
-	serviceLine := fmt.Sprintf("[ %s ]", svc)
-	b.WriteString(serviceStyle.Render(serviceLine))
+	// OMNI-PITCHER in big block letters
+	var svcOutput string
+	if m.glitchPhase {
+		svcOutput = glitchText(serviceText, m.glitchFrames)
+	} else {
+		svcOutput = serviceBlockStyle.Render(serviceText)
+	}
+	b.WriteString(svcOutput)
 	b.WriteString("\n")
 
 	// Apply CRT scanline effect
@@ -209,7 +196,6 @@ func (m model) View() string {
 // glitchText replaces random characters in the text with glitch chars,
 // decreasing over time as glitchFrame increases.
 func glitchText(text string, glitchFrame int) string {
-	// More glitch early, less as it stabilizes
 	glitchProbability := float64(10-glitchFrame) / 10.0
 	if glitchProbability < 0 {
 		glitchProbability = 0
@@ -231,7 +217,7 @@ func glitchText(text string, glitchFrame int) string {
 		}
 	}
 
-	return greenGlow.Render(string(result))
+	return orangeBright.Render(string(result))
 }
 
 // applyScanlines dims every other line for a CRT monitor effect.
@@ -239,7 +225,7 @@ func applyScanlines(text string) string {
 	lines := strings.Split(text, "\n")
 	for i, line := range lines {
 		if i%2 == 1 {
-			lines[i] = dimGreen.Render(line)
+			lines[i] = dimOrange.Render(line)
 		}
 	}
 	return strings.Join(lines, "\n")
@@ -249,7 +235,6 @@ func applyScanlines(text string) string {
 func centerText(text string, width int) string {
 	lines := strings.Split(text, "\n")
 	for i, line := range lines {
-		// Strip ANSI for length calculation
 		visLen := lipgloss.Width(line)
 		if visLen < width {
 			pad := (width - visLen) / 2
@@ -259,19 +244,23 @@ func centerText(text string, width int) string {
 	return strings.Join(lines, "\n")
 }
 
-// renderStatic returns the banner without animation (fallback).
-func renderStatic() string {
-	bannerLines := strings.Split(bannerText, "\n")
-	sup2Lines := strings.Split(superscript2, "\n")
-
+// renderHeader returns the colored banner as a persistent header for the terminal.
+func renderHeader() string {
 	var b strings.Builder
-	for i, line := range bannerLines {
-		b.WriteString(line)
-		if i < len(sup2Lines) {
-			b.WriteString(" ")
-			b.WriteString(sup2Lines[i])
-		}
-		b.WriteString("\n")
-	}
+	b.WriteString(orangeHot.Render(bannerText))
+	b.WriteString(accentStyle.Render("2"))
+	b.WriteString("\n")
+	b.WriteString(serviceBlockStyle.Render(serviceText))
+	b.WriteString("\n")
+	return b.String()
+}
+
+// renderStatic returns the banner without colors (fallback).
+func renderStatic() string {
+	var b strings.Builder
+	b.WriteString(bannerText)
+	b.WriteString("2\n")
+	b.WriteString(serviceText)
+	b.WriteString("\n")
 	return b.String()
 }

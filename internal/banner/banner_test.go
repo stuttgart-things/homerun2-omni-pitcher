@@ -17,8 +17,21 @@ func TestRenderStatic(t *testing.T) {
 	if !strings.Contains(output, "██╗  ██╗") {
 		t.Error("expected banner to contain HOMERUN block characters")
 	}
-	if !strings.Contains(output, "█████╔╝") {
-		t.Error("expected banner to contain superscript 2")
+	if !strings.Contains(output, "2") {
+		t.Error("expected banner to contain '2'")
+	}
+	if !strings.Contains(output, "██████╗") {
+		t.Error("expected banner to contain OMNI-PITCHER block text")
+	}
+}
+
+func TestRenderHeader(t *testing.T) {
+	output := renderHeader()
+	if !strings.Contains(output, "██╗  ██╗") {
+		t.Error("expected header to contain HOMERUN block characters")
+	}
+	if output == "" {
+		t.Error("expected non-empty header")
 	}
 }
 
@@ -58,18 +71,14 @@ func TestModelAutoQuits(t *testing.T) {
 	}
 }
 
-func TestServiceRotation(t *testing.T) {
+func TestBaseballAnimation(t *testing.T) {
 	m := initialModel()
 	m.glitchPhase = false
 
-	initial := m.serviceIdx
-
-	for range 20 {
-		m = updateModel(m, tickMsg{})
-	}
-
-	if m.serviceIdx == initial {
-		t.Error("expected service index to rotate after 20 ticks")
+	view := m.View()
+	// Should contain the baseball art characters
+	if !strings.Contains(view, "()") {
+		t.Error("expected view to contain baseball art")
 	}
 }
 
