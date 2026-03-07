@@ -3,14 +3,13 @@ package middleware
 import (
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"testing"
 )
 
 func TestTokenAuthMiddleware(t *testing.T) {
 	dummyHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"status":"ok"}`))
+		_, _ = w.Write([]byte(`{"status":"ok"}`))
 	})
 
 	tests := []struct {
@@ -66,8 +65,7 @@ func TestTokenAuthMiddleware(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			os.Setenv("AUTH_TOKEN", tt.envToken)
-			defer os.Unsetenv("AUTH_TOKEN")
+			t.Setenv("AUTH_TOKEN", tt.envToken)
 
 			req, err := http.NewRequest("GET", "/test", nil)
 			if err != nil {
