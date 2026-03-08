@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
+	tea "charm.land/bubbletea/v2"
+	"charm.land/lipgloss/v2"
 )
 
 const bannerText = `██╗  ██╗ ██████╗ ███╗   ███╗███████╗██████╗ ██╗   ██╗███╗   ██╗
@@ -78,7 +78,7 @@ type model struct {
 // Show displays the animated banner for a brief duration, then prints
 // the final frame as a persistent header before returning.
 func Show() {
-	p := tea.NewProgram(initialModel(), tea.WithAltScreen())
+	p := tea.NewProgram(initialModel())
 	_, _ = p.Run() // Non-fatal: if banner animation fails, we still print the header below
 	// Print the final banner as a persistent header for the running program
 	fmt.Println(renderHeader())
@@ -104,7 +104,7 @@ func (m model) Init() tea.Cmd {
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
-	case tea.KeyMsg:
+	case tea.KeyPressMsg:
 		m.done = true
 		return m, tea.Quit
 
@@ -137,9 +137,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-func (m model) View() string {
+func (m model) View() tea.View {
 	if m.done {
-		return ""
+		return tea.NewView("")
 	}
 
 	var b strings.Builder
@@ -190,7 +190,9 @@ func (m model) View() string {
 	output := applyScanlines(b.String())
 
 	// Center in terminal
-	return centerText(output, m.width)
+	v := tea.NewView(centerText(output, m.width))
+	v.AltScreen = true
+	return v
 }
 
 // glitchText replaces random characters in the text with glitch chars,

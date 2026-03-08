@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	tea "github.com/charmbracelet/bubbletea"
+	tea "charm.land/bubbletea/v2"
 )
 
 func updateModel(m model, msg tea.Msg) model {
@@ -42,7 +42,7 @@ func TestModelGlitchPhase(t *testing.T) {
 	}
 
 	view := m.View()
-	if view == "" {
+	if view.Content == "" {
 		t.Error("expected non-empty view during glitch phase")
 	}
 }
@@ -77,7 +77,7 @@ func TestBaseballAnimation(t *testing.T) {
 
 	view := m.View()
 	// Should contain the baseball art characters
-	if !strings.Contains(view, "()") {
+	if !strings.Contains(view.Content, "()") {
 		t.Error("expected view to contain baseball art")
 	}
 }
@@ -105,7 +105,7 @@ func TestCenterText(t *testing.T) {
 
 func TestKeyQuits(t *testing.T) {
 	m := initialModel()
-	m = updateModel(m, tea.KeyMsg{Type: tea.KeyEnter})
+	m = updateModel(m, tea.KeyPressMsg{Code: tea.KeyEnter})
 
 	if !m.done {
 		t.Error("expected key press to set done=true")
