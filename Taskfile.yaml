@@ -302,6 +302,30 @@ tasks:
           echo "Aborted."
         fi
 
+  # === Smoke Test ===
+
+  smoke-test:
+    desc: Run smoke test against a deployed pitcher instance
+    vars:
+      ENDPOINT: '{{ .ENDPOINT | default "https://homerun2-omni-pitcher.movie-scripts2.sthings-vsphere.labul.sva.de" }}'
+      AUTH_TOKEN: '{{ .AUTH_TOKEN | default "env:PITCHER_AUTH_TOKEN" }}'
+      MESSAGES_FILE: '{{ .MESSAGES_FILE | default "tests/smoke-test-messages.json" }}'
+      DELAY_SEC: '{{ .DELAY_SEC | default "2" }}'
+    cmds:
+      - |
+        echo "Running smoke test against: {{ .ENDPOINT }}"
+
+        dagger call smoke-test \
+          --endpoint "{{ .ENDPOINT }}" \
+          --auth-token "{{ .AUTH_TOKEN }}" \
+          --messages-file "{{ .MESSAGES_FILE }}" \
+          --delay-sec "{{ .DELAY_SEC }}" \
+          --progress plain \
+          export --path=/tmp/smoke-test-report-{{ .PROJECT }}.txt
+
+        echo ""
+        cat /tmp/smoke-test-report-{{ .PROJECT }}.txt
+
   # === Deploy KCL to Cluster ===
 
   deploy-kcl:

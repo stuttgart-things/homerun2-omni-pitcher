@@ -1,0 +1,51 @@
+[
+  {
+    "title": "Deployment Verification",
+    "message": "Smoke test: verifying homerun2-omni-pitcher deployment is accepting messages",
+    "severity": "info",
+    "author": "smoke-test",
+    "system": "smoke-test",
+    "tags": "smoke-test,deployment,verification"
+  },
+  {
+    "title": "CI Pipeline Completed",
+    "message": "Build #4821 passed all stages: lint, test, build, scan, push",
+    "severity": "success",
+    "author": "github-actions",
+    "system": "ci-pipeline",
+    "tags": "ci,build,success",
+    "assigneename": "Dev Team",
+    "assigneeaddress": "dev@example.com",
+    "url": "https://github.com/example/project/actions/runs/4821"
+  },
+  {
+    "title": "High CPU on Worker Node",
+    "message": "Node worker-3 CPU usage at 89% for the last 10 minutes - investigate workload distribution",
+    "severity": "warning",
+    "author": "prometheus-alertmanager",
+    "system": "monitoring",
+    "tags": "infrastructure,cpu,alerting",
+    "assigneename": "SRE Team",
+    "assigneeaddress": "sre@example.com"
+  },
+  {
+    "title": "Database Migration Failed",
+    "message": "Migration 20260308_add_index failed on staging: duplicate key constraint on table events",
+    "severity": "error",
+    "author": "flyway",
+    "system": "staging-db",
+    "tags": "database,migration,error",
+    "assigneename": "Backend Team",
+    "assigneeaddress": "backend@example.com"
+  },
+  {
+    "title": "Image Scan Report",
+    "message": "Trivy scan for app:v2.1.0 completed - 0 critical, 2 high, 5 medium vulnerabilities",
+    "severity": "warning",
+    "author": "trivy-operator",
+    "system": "security-pipeline",
+    "tags": "security,scan,container",
+    "artifacts": "ghcr.io/example/app:v2.1.0",
+    "url": "https://github.com/example/app/security/advisories"
+  }
+]
