@@ -24,6 +24,9 @@ vars:
   DAGGER_MODULE_DIR: ./dagger
   SOURCE_CODE_DIR: "."
   DAGGER_KCL_MODULE: github.com/stuttgart-things/dagger/kcl@v0.82.0
+  DAGGER_K8S_DEPLOY_MODULE: github.com/stuttgart-things/blueprints/kubernetes-deployment@v1.68.0
+  KUBECONFIG_PATH: ~/.kube/movie-scripts
+  DEPLOY_NAMESPACE: homerun2
   KCL_SOURCE_DIR: kcl
   KCL_PROFILE_FILE: tests/kcl-deploy-profile.yaml
   RENDERED_OUTPUT_PATH: /tmp/rendered-{{ .PROJECT }}.yaml
@@ -298,6 +301,31 @@ tasks:
         else
           echo "Aborted."
         fi
+
+  # === Deploy KCL to Cluster ===
+
+  deploy-kcl:
+    desc: Render and apply KCL manifests to Kubernetes via Dagger blueprint
+    vars:
+      OCI_SOURCE: '{{ .OCI_SOURCE | default (printf "ghcr.io/%s/%s-kustomize" .ORGA_NAME .PROJECT) }}'
+      PARAMETERS: '{{ .PARAMETERS | default (printf "namespace=%s" .DEPLOY_NAMESPACE) }}'
+      NAMESPACE: '{{ .NAMESPACE | default .DEPLOY_NAMESPACE }}'
+      KUBECONFIG: '{{ .KUBECONFIG | default .KUBECONFIG_PATH }}'
+    cmds:
+      - |
+        echo "Deploying KCL manifests..."
+        echo "OCI source: {{ .OCI_SOURCE }}"
+        echo "Parameters: {{ .PARAMETERS }}"
+        echo "Namespace: {{ .NAMESPACE }}"
+
+        dagger call -m {{ .DAGGER_K8S_DEPLOY_MODULE }} deploy-kcl \
+          --oci-source "{{ .OCI_SOURCE }}" \
+          --parameters '{{ .PARAMETERS }}' \
+          --kube-config "file://{{ .KUBECONFIG }}" \
+          --namespace "{{ .NAMESPACE }}" \
+          --progress plain
+
+        echo "Deployment complete!"
 
   # === Release ===
 

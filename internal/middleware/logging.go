@@ -5,8 +5,14 @@ import (
 	"encoding/hex"
 	"log/slog"
 	"net/http"
+	"os"
+	"strings"
 	"time"
 )
+
+// logHealthChecks controls whether /health requests are logged.
+// Set LOG_HEALTH_CHECKS=true to include them (default: false).
+var logHealthChecks = strings.EqualFold(os.Getenv("LOG_HEALTH_CHECKS"), "true")
 
 // statusRecorder wraps http.ResponseWriter to capture the status code.
 type statusRecorder struct {
@@ -32,6 +38,10 @@ func RequestLogging(next http.Handler) http.Handler {
 
 		rec := &statusRecorder{ResponseWriter: w, statusCode: http.StatusOK}
 		next.ServeHTTP(rec, r)
+
+		if r.URL.Path == "/health" && !logHealthChecks {
+			return
+		}
 
 		slog.Info("http request",
 			"method", r.Method,
