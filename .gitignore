@@ -30,6 +30,9 @@ go.work.sum
 # env file
 .env
 
+# env-specific KCL profiles (may contain secrets)
+tests/kcl-movie-scripts-profile.yaml
+
 # Editor/IDE
 # .idea/
 # .vscode/

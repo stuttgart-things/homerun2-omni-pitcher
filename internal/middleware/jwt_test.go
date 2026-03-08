@@ -41,7 +41,7 @@ func testJWKSServer(t *testing.T, key *rsa.PublicKey) *httptest.Server {
 }
 
 func encodeBase64URL(data []byte) string {
-	const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"
+	const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_" // pragma: allowlist secret
 	result := make([]byte, 0, (len(data)*4+2)/3)
 	for i := 0; i < len(data); i += 3 {
 		var val uint32
