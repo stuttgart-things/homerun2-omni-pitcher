@@ -121,6 +121,20 @@ task render-manifests-quick
 
 The KCL modules cover: `deploy.k`, `service.k`, `ingress.k`, `secret.k`, `configmap.k`, `serviceaccount.k`, `namespace.k`, `httproute.k`.
 
+Deploy to a cluster using the Dagger `kubernetes-deployment` blueprint:
+
+```bash
+# Deploy with defaults (uses Taskfile vars)
+task deploy-kcl
+
+# Deploy with custom parameters
+task deploy-kcl \
+  OCI_SOURCE=ghcr.io/stuttgart-things/homerun2-omni-pitcher-kustomize \
+  PARAMETERS='namespace=homerun2' \
+  NAMESPACE=homerun2 \
+  KUBECONFIG=~/.kube/movie-scripts
+```
+
 </details>
 
 <details>
