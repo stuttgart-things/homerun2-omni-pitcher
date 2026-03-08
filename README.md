@@ -109,19 +109,22 @@ docker run -p 8080:8080 \
 <details>
 <summary><b>Deploy to Kubernetes with KCL</b></summary>
 
-KCL manifests in `kcl/` are the source of truth for Kubernetes deployment. Render and apply:
+KCL manifests in `kcl/` are the source of truth for Kubernetes deployment. The modular KCL modules cover: `deploy.k`, `service.k`, `ingress.k`, `secret.k`, `configmap.k`, `serviceaccount.k`, `namespace.k`, `httproute.k`.
+
+**Render manifests locally:**
 
 ```bash
-# Render manifests
+# Render with kcl CLI
 kcl run kcl/ -Y tests/kcl-deploy-profile.yaml
 
-# Or use the Taskfile
+# Render via Dagger (non-interactive)
 task render-manifests-quick
+
+# Render via Dagger (interactive, prompts for source/profile/output)
+task render-manifests
 ```
 
-The KCL modules cover: `deploy.k`, `service.k`, `ingress.k`, `secret.k`, `configmap.k`, `serviceaccount.k`, `namespace.k`, `httproute.k`.
-
-Deploy to a cluster using the Dagger `kubernetes-deployment` blueprint:
+**Deploy to a cluster using the Dagger `kubernetes-deployment` blueprint:**
 
 ```bash
 # Deploy with defaults (uses Taskfile vars)
@@ -133,6 +136,18 @@ task deploy-kcl \
   PARAMETERS='namespace=homerun2' \
   NAMESPACE=homerun2 \
   KUBECONFIG=~/.kube/movie-scripts
+```
+
+This uses the [`kubernetes-deployment`](https://github.com/stuttgart-things/blueprints) Dagger module (v1.68.0) which renders KCL from an OCI source and applies it to the target cluster.
+
+**Build and push kustomize base as OCI artifact:**
+
+```bash
+# Render kustomize base from KCL
+task render-kustomize-base
+
+# Push to OCI registry (interactive, prompts for tag)
+task push-kustomize-base
 ```
 
 </details>
@@ -224,6 +239,41 @@ Taskfile.yaml              # Task runner
 | `JWT_AUDIENCE` | Expected JWT audience (jwt mode) | (optional) |
 | `LOG_FORMAT` | Log format: `json` or `text` | `json` |
 | `LOG_LEVEL` | Log level: `debug`, `info`, `warn`, `error` | `info` |
+| `LOG_HEALTH_CHECKS` | Log `/health` probe requests (`true`/`false`) | `false` |
+
+</details>
+
+<details>
+<summary><b>CI/CD and release process</b></summary>
+
+Releases are fully automated via GitHub Actions and [semantic-release](https://semantic-release.gitbook.io/).
+
+**Workflow chain on merge to `main`:**
+
+1. **Build, Push & Scan Container Image** — builds the container image with ko, pushes to `ghcr.io`, and scans with Trivy
+2. **Release** (triggered on successful image build) — runs semantic-release which:
+   - Analyzes commit messages using [conventional commits](https://www.conventionalcommits.org/)
+   - `fix:` → patch bump (e.g., 1.1.2 → 1.1.3)
+   - `feat:` → minor bump (e.g., 1.1.2 → 1.2.0)
+   - Creates a GitHub release with changelog
+   - Stages the container image to `ghcr.io` with the release tag
+   - Pushes the kustomize base as OCI artifact to `ghcr.io/stuttgart-things/homerun2-omni-pitcher-kustomize`
+
+**Trigger a release manually:**
+
+```bash
+# Via GitHub Actions UI or CLI
+task trigger-release
+
+# Local release pipeline (interactive)
+task release-local
+```
+
+**Branch naming convention:**
+
+- `fix/<issue-number>-<short-description>` — bug fixes (patch)
+- `feat/<issue-number>-<short-description>` — new features (minor)
+- `test/<issue-number>-<short-description>` — test-only changes (no release)
 
 </details>
 
