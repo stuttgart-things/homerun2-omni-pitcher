@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.1.2...v1.2.0) (2026-03-08)
+
+
+### Features
+
+* add deploy-kcl task and suppress health check logging ([2ae31bc](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/2ae31bc17d4bdd642f059abf7607c61e3d1a0dbb))
+
 ## [1.1.2](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.1.1...v1.1.2) (2026-03-08)
 
 
