@@ -3,7 +3,7 @@
 A Go HTTP microservice that accepts JSON messages via `POST /pitch` and enqueues them into Redis Streams using the [homerun-library](https://github.com/stuttgart-things/homerun-library).
 
 [![Build & Test](https://github.com/stuttgart-things/homerun2-omni-pitcher/actions/workflows/build-test.yaml/badge.svg)](https://github.com/stuttgart-things/homerun2-omni-pitcher/actions/workflows/build-test.yaml)
-[![Pages](https://stuttgart-things.github.io/homerun2-omni-pitcher/)](https://stuttgart-things.github.io/homerun2-omni-pitcher/)
+[![Docs](https://img.shields.io/badge/docs-pages-blue)](https://stuttgart-things.github.io/homerun2-omni-pitcher/)
 
 ## API Endpoints
 
@@ -103,6 +103,50 @@ docker run -p 8080:8080 \
   -e REDIS_STREAM=messages -e AUTH_TOKEN=mysecret \
   ghcr.io/stuttgart-things/homerun2-omni-pitcher:<tag>
 ```
+
+</details>
+
+<details>
+<summary><b>Deploy full stack via Flux (recommended)</b></summary>
+
+The [homerun2 Flux app](https://github.com/stuttgart-things/flux/tree/main/apps/homerun2) deploys the complete stack (Redis Stack + omni-pitcher + core-catcher) into a shared namespace using Kustomize Components.
+
+```yaml
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: homerun2-flux
+  namespace: flux-system
+spec:
+  interval: 1h
+  retryInterval: 1m
+  timeout: 5m
+  sourceRef:
+    kind: GitRepository
+    name: flux-apps
+  path: ./apps/homerun2
+  prune: true
+  wait: true
+  postBuild:
+    substitute:
+      HOMERUN2_NAMESPACE: homerun2-flux
+      HOMERUN2_OMNI_PITCHER_VERSION: v1.2.0
+      HOMERUN2_OMNI_PITCHER_HOSTNAME: pitcher
+      HOMERUN2_CORE_CATCHER_VERSION: v0.5.0
+      HOMERUN2_CORE_CATCHER_KUSTOMIZE_VERSION: v0.5.0-web
+      HOMERUN2_CORE_CATCHER_HOSTNAME: catcher
+      GATEWAY_NAME: my-gateway
+      GATEWAY_NAMESPACE: default
+      DOMAIN: my-cluster.example.com
+      HOMERUN2_REDIS_VERSION: "17.1.4"
+      HOMERUN2_REDIS_STORAGE_CLASS: nfs4-csi
+    substituteFrom:
+      - kind: Secret
+        name: homerun2-flux-secrets
+```
+
+See the [Flux app README](https://github.com/stuttgart-things/flux/tree/main/apps/homerun2) for all variables and a complete cluster example.
 
 </details>
 
@@ -322,6 +366,7 @@ task build-scan-image-ko
 ## Links
 
 - [GitHub Pages](https://stuttgart-things.github.io/homerun2-omni-pitcher/)
+- [Flux App](https://github.com/stuttgart-things/flux/tree/main/apps/homerun2)
 - [Releases](https://github.com/stuttgart-things/homerun2-omni-pitcher/releases)
 - [Container Images](https://github.com/stuttgart-things/homerun2-omni-pitcher/pkgs/container/homerun2-omni-pitcher)
 - [homerun-library](https://github.com/stuttgart-things/homerun-library)
