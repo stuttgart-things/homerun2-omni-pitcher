@@ -97,6 +97,7 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/health", handlers.NewHealthHandler(buildInfo))
 	mux.HandleFunc("/pitch", authMiddleware(handlers.NewPitchHandler(p)))
+	mux.HandleFunc("/pitch/grafana", authMiddleware(handlers.NewGrafanaPitchHandler(p)))
 
 	srv := &http.Server{
 		Addr:    ":" + port,
