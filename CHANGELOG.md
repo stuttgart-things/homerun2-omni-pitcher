@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.4.1...v1.5.0) (2026-03-11)
+
+
+### Features
+
+* add GitHub webhook endpoint with HMAC signature validation ([2288804](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/2288804fb3f50f9a3b4431990a0e6419da7e7879)), closes [#92](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/92)
+
 ## [1.4.1](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.4.0...v1.4.1) (2026-03-11)
 
 
