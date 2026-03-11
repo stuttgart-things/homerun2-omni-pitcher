@@ -42,6 +42,16 @@ func (p *RedisPitcher) Pitch(msg homerun.Message) (string, string, error) {
 	if err != nil {
 		return "", "", fmt.Errorf("failed to enqueue message to Redis stream: %w", err)
 	}
+
+	// Best-effort dual-write to RediSearch index (non-blocking for the pitch path)
+	if p.Config.Index != "" {
+		if err := homerun.StoreInRediSearch(msg, p.Config); err != nil {
+			slog.Warn("failed to index message in RediSearch (best-effort)", "error", err, "index", p.Config.Index)
+		} else {
+			slog.Debug("message indexed in RediSearch", "index", p.Config.Index)
+		}
+	}
+
 	return objectID, streamID, nil
 }
 
