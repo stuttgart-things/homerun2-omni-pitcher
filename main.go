@@ -53,7 +53,7 @@ func main() {
 		cancel()
 
 		p = rp
-		slog.Info("pitcher mode: redis", "addr", redisConfig.Addr, "port", redisConfig.Port, "stream", redisConfig.Stream)
+		slog.Info("pitcher mode: redis", "addr", redisConfig.Addr, "port", redisConfig.Port, "stream", redisConfig.Stream, "searchIndex", redisConfig.Index)
 	}
 
 	// Select auth middleware

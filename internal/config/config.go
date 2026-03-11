@@ -14,6 +14,7 @@ func LoadRedisConfig() homerun.RedisConfig {
 		Port:     homerun.GetEnv("REDIS_PORT", "6379"),
 		Password: homerun.GetEnv("REDIS_PASSWORD", ""),
 		Stream:   homerun.GetEnv("REDIS_STREAM", "messages"),
+		Index:    homerun.GetEnv("REDIS_SEARCH_INDEX", ""),
 	}
 }
 
