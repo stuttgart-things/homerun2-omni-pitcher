@@ -3,7 +3,7 @@ module github.com/stuttgart-things/homerun2-omni-pitcher
 go 1.24.2
 
 require (
-	charm.land/bubbletea/v2 v2.0.1
+	charm.land/bubbletea/v2 v2.0.2
 	charm.land/lipgloss/v2 v2.0.0
 	github.com/MicahParks/keyfunc/v3 v3.8.0
 	github.com/golang-jwt/jwt/v5 v5.3.1
