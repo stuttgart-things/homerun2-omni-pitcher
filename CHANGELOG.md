@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.2.0...v1.3.0) (2026-03-11)
+
+
+### Features
+
+* dual-write messages to RediSearch index at pitcher level ([90a112b](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/90a112b85f2106b551a88437a6c3c44e6cc11396)), closes [#87](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/87)
+
 # [1.2.0](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.1.2...v1.2.0) (2026-03-08)
 
 
