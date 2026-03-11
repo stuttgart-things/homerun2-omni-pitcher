@@ -1,3 +1,15 @@
+# [1.4.0](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.3.0...v1.4.0) (2026-03-11)
+
+
+### Bug Fixes
+
+* **deps:** update module charm.land/bubbletea/v2 to v2.0.2 ([29cc28b](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/29cc28b583fd6a7258b97f7f752a38acf747e861))
+
+
+### Features
+
+* add Grafana alert webhook endpoint ([bcd25bf](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/bcd25bfd0447bb20167c1382a66a76fa56994383)), closes [#86](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/86)
+
 # [1.3.0](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.2.0...v1.3.0) (2026-03-11)
 
 
