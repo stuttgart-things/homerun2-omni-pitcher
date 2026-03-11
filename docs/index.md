@@ -24,6 +24,7 @@ go run main.go
 | Endpoint  | Method | Description                          |
 |-----------|--------|--------------------------------------|
 | `/pitch`  | POST   | Enqueue a message to Redis Streams   |
+| `/pitch/grafana` | POST | Accept Grafana webhook alerts |
 | `/health` | GET    | Health check                         |
 
 ## Authentication
@@ -41,6 +42,7 @@ curl -X POST http://localhost:8080/pitch \
 
 - **Go** stdlib `net/http` - HTTP server with graceful shutdown
 - **Redis Streams** - Message queue via `homerun-library`
+- **RediSearch** - Optional full-text indexing for analytics (dual-write, enabled via `REDIS_SEARCH_INDEX`)
 - **ko** - Container image builds (distroless)
 - **KCL** - Kubernetes manifest generation
 - **Dagger** - CI/CD pipeline functions
