@@ -25,6 +25,7 @@ go run main.go
 |-----------|--------|--------------------------------------|
 | `/pitch`  | POST   | Enqueue a message to Redis Streams   |
 | `/pitch/grafana` | POST | Accept Grafana webhook alerts |
+| `/pitch/github` | POST | Accept GitHub webhook events |
 | `/health` | GET    | Health check                         |
 
 ## Authentication
