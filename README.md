@@ -12,6 +12,7 @@ A Go HTTP microservice that accepts JSON messages via `POST /pitch` and enqueues
 | `/health` | `GET` | None | Health check (returns version, commit, date) |
 | `/pitch` | `POST` | Bearer token or JWT | Submit a message to Redis Streams or file |
 | `/pitch/grafana` | `POST` | Bearer token or JWT | Accept Grafana webhook alerts and enqueue as messages |
+| `/pitch/github` | `POST` | Bearer token or JWT | Accept GitHub webhook events and enqueue as messages |
 
 <details>
 <summary><b>Pitch a message</b></summary>
@@ -103,6 +104,31 @@ Response:
   "errors": []
 }
 ```
+
+</details>
+
+<details>
+<summary><b>Pitch from GitHub webhooks</b></summary>
+
+Configure a [GitHub webhook](https://docs.github.com/en/webhooks) on your repository or organization:
+
+- **Payload URL**: `https://<pitcher-host>/pitch/github`
+- **Content type**: `application/json`
+- **Secret**: set a shared secret and configure `GITHUB_WEBHOOK_SECRET` on the pitcher
+
+Supported events: `push`, `pull_request`, `issues`, `release`, `workflow_run` (unknown events are accepted with generic mapping).
+
+| GitHub field | Message field |
+|---|---|
+| event-specific title | `title` |
+| event body/description | `message` |
+| action/conclusion | `severity` |
+| sender.login / pusher | `author` |
+| repository.full_name | `system` |
+| repository topics | `tags` |
+| resource HTML URL | `url` |
+
+Severity mapping: merged PRs and successful workflows → `success`, workflow failures → `critical`, workflow cancelled → `warning`, everything else → `info`.
 
 </details>
 
@@ -318,6 +344,7 @@ Taskfile.yaml              # Task runner
 | `REDIS_PASSWORD` | Redis password | (empty) |
 | `REDIS_STREAM` | Redis stream name | `messages` |
 | `REDIS_SEARCH_INDEX` | RediSearch index name (enables dual-write) | (empty = disabled) |
+| `GITHUB_WEBHOOK_SECRET` | HMAC secret for GitHub webhook signature validation | (empty = skip) |
 | `AUTH_MODE` | Auth mode: `token` or `jwt` | `token` |
 | `AUTH_TOKEN` | Bearer token (token mode) | (required) |
 | `JWT_JWKS_URL` | JWKS endpoint URL (jwt mode) | (required) |

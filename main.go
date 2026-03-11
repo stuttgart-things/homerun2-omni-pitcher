@@ -99,6 +99,9 @@ func main() {
 	mux.HandleFunc("/pitch", authMiddleware(handlers.NewPitchHandler(p)))
 	mux.HandleFunc("/pitch/grafana", authMiddleware(handlers.NewGrafanaPitchHandler(p)))
 
+	githubWebhookSecret := homerun.GetEnv("GITHUB_WEBHOOK_SECRET", "")
+	mux.HandleFunc("/pitch/github", authMiddleware(handlers.NewGitHubPitchHandler(p, githubWebhookSecret)))
+
 	srv := &http.Server{
 		Addr:    ":" + port,
 		Handler: middleware.RequestLogging(mux),
