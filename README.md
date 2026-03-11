@@ -11,6 +11,7 @@ A Go HTTP microservice that accepts JSON messages via `POST /pitch` and enqueues
 |----------|--------|------|-------------|
 | `/health` | `GET` | None | Health check (returns version, commit, date) |
 | `/pitch` | `POST` | Bearer token or JWT | Submit a message to Redis Streams or file |
+| `/pitch/grafana` | `POST` | Bearer token or JWT | Accept Grafana webhook alerts and enqueue as messages |
 
 <details>
 <summary><b>Pitch a message</b></summary>
@@ -62,6 +63,46 @@ Response:
 | `assigneename` | No | Name of the assignee | - |
 | `artifacts` | No | Related artifacts (e.g., container image) | - |
 | `url` | No | Related URL | - |
+
+</details>
+
+<details>
+<summary><b>Pitch from Grafana alerts</b></summary>
+
+Configure a [Grafana webhook contact point](https://grafana.com/docs/grafana/latest/alerting/configure-notifications/manage-contact-points/integrations/webhook-notifier/) to send alerts to `/pitch/grafana`:
+
+```bash
+# Grafana webhook URL
+https://<pitcher-host>/pitch/grafana
+
+# Required header in Grafana contact point config
+Authorization: Bearer <YOUR_AUTH_TOKEN>
+```
+
+Each alert in the payload is mapped to a `homerun.Message`:
+
+| Grafana field | Message field |
+|---|---|
+| `labels.alertname` | `title` |
+| `annotations.summary` / `description` | `message` |
+| `labels.severity` + `status` | `severity` |
+| `startsAt` | `timestamp` |
+| `receiver` | `system` |
+| `dashboardURL` / `panelURL` / `generatorURL` | `url` |
+| remaining labels | `tags` |
+
+Response:
+
+```json
+{
+  "status": "success",
+  "message": "2 of 2 alerts enqueued",
+  "results": [
+    {"objectId": "...", "streamId": "messages", "status": "success", "message": "Alert abc123 enqueued"}
+  ],
+  "errors": []
+}
+```
 
 </details>
 
@@ -276,6 +317,7 @@ Taskfile.yaml              # Task runner
 | `REDIS_PORT` | Redis server port | `6379` |
 | `REDIS_PASSWORD` | Redis password | (empty) |
 | `REDIS_STREAM` | Redis stream name | `messages` |
+| `REDIS_SEARCH_INDEX` | RediSearch index name (enables dual-write) | (empty = disabled) |
 | `AUTH_MODE` | Auth mode: `token` or `jwt` | `token` |
 | `AUTH_TOKEN` | Bearer token (token mode) | (required) |
 | `JWT_JWKS_URL` | JWKS endpoint URL (jwt mode) | (required) |
