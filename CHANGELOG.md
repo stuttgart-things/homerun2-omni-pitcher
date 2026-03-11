@@ -1,3 +1,10 @@
+## [1.4.1](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.4.0...v1.4.1) (2026-03-11)
+
+
+### Bug Fixes
+
+* **deps:** update module charm.land/lipgloss/v2 to v2.0.1 ([c03468f](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/c03468f105fc15a03ecfaf3e36543ae40ce0337f))
+
 # [1.4.0](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.3.0...v1.4.0) (2026-03-11)
 
 
