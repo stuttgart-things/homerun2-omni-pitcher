@@ -36,17 +36,19 @@ func (p *RedisPitcher) EnsureIndex(ctx context.Context) error {
 
 	slog.Info("redisearch index not found, creating", "index", p.Config.Index)
 
+	// All fields use TEXT (not TAG) for FT.AGGREGATE GROUPBY compatibility.
+	// TAG fields on JSON indexes return only the total count without grouped rows.
 	args := []any{
 		"FT.CREATE", p.Config.Index,
 		"ON", "JSON",
 		"SCHEMA",
-		"$.severity", "AS", "severity", "TAG",
-		"$.system", "AS", "system", "TAG",
+		"$.severity", "AS", "severity", "TEXT",
+		"$.system", "AS", "system", "TEXT",
 		"$.timestamp", "AS", "timestamp", "TEXT",
 		"$.title", "AS", "title", "TEXT",
 		"$.message", "AS", "message", "TEXT",
-		"$.author", "AS", "author", "TAG",
-		"$.tags", "AS", "tags", "TAG",
+		"$.author", "AS", "author", "TEXT",
+		"$.tags", "AS", "tags", "TEXT",
 	}
 
 	if err := client.Do(ctx, args...).Err(); err != nil {
