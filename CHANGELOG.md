@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.5.1...v1.6.0) (2026-03-12)
+
+
+### Features
+
+* ensure RediSearch index exists on startup ([80a54a1](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/80a54a1c0d39c059b3ac10182f96317f2fef62c2)), closes [#95](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/95)
+
 ## [1.5.1](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.5.0...v1.5.1) (2026-03-12)
 
 
