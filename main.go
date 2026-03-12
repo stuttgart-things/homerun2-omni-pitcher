@@ -52,6 +52,11 @@ func main() {
 		}
 		cancel()
 
+		// Ensure RediSearch index exists before accepting requests
+		if err := rp.EnsureIndex(context.Background()); err != nil {
+			slog.Warn("failed to ensure redisearch index", "index", redisConfig.Index, "error", err)
+		}
+
 		p = rp
 		slog.Info("pitcher mode: redis", "addr", redisConfig.Addr, "port", redisConfig.Port, "stream", redisConfig.Stream, "searchIndex", redisConfig.Index)
 	}
