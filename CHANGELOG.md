@@ -1,3 +1,10 @@
+## [1.6.1](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.6.0...v1.6.1) (2026-03-12)
+
+
+### Bug Fixes
+
+* use TEXT instead of TAG fields in RediSearch index schema ([e71012d](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/e71012d6f58c6c8c5217366f977c669ff5163962))
+
 # [1.6.0](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.5.1...v1.6.0) (2026-03-12)
 
 
