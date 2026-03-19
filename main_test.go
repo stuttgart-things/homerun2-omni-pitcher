@@ -8,7 +8,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	homerun "github.com/stuttgart-things/homerun-library/v2"
+	homerun "github.com/stuttgart-things/homerun-library/v3"
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/handlers"
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/models"
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/pitcher"

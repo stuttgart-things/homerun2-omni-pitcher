@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	homerun "github.com/stuttgart-things/homerun-library/v2"
+	homerun "github.com/stuttgart-things/homerun-library/v3"
 )
 
 func TestEnsureIndexSkipsWhenEmpty(t *testing.T) {
