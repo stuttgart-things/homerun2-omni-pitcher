@@ -1,3 +1,10 @@
+## [1.6.2](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.6.1...v1.6.2) (2026-03-19)
+
+
+### Bug Fixes
+
+* upgrade homerun-library v2 to v3 for redis error handling ([49aebf5](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/49aebf5954becec84f565b75e6ce305449f2ffd1))
+
 ## [1.6.1](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.6.0...v1.6.1) (2026-03-12)
 
 
