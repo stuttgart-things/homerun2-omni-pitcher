@@ -11,7 +11,7 @@ import (
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/models"
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/pitcher"
 
-	homerun "github.com/stuttgart-things/homerun-library/v2"
+	homerun "github.com/stuttgart-things/homerun-library/v3"
 )
 
 // NewGrafanaPitchHandler creates a handler that accepts Grafana webhook payloads
