@@ -12,5 +12,5 @@ jobs:
     with:
       runs-on: ubuntu-latest
       packages: homerun2-omni-pitcher,homerun2-omni-pitcher-kustomize
-      dry-run: true
+      dry-run: false
     secrets: inherit # pragma: allowlist secret
