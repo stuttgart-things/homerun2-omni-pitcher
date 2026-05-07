@@ -1,3 +1,11 @@
+## [1.6.5](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.6.4...v1.6.5) (2026-05-07)
+
+
+### Bug Fixes
+
+* **deps:** update module charm.land/bubbletea/v2 to v2.0.6 ([3a3e153](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/3a3e153e3da23774eb1ee2ddfc101348ae4a52f4))
+* **deps:** update module github.com/redis/go-redis/v9 to v9.19.0 ([8fce492](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/8fce4921d172c15089a24f943c4cb17843d32e0e))
+
 ## [1.6.4](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.6.3...v1.6.4) (2026-04-15)
 
 
