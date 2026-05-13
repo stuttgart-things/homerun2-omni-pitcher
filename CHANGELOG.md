@@ -1,3 +1,10 @@
+# [1.8.0](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.7.0...v1.8.0) (2026-05-13)
+
+
+### Features
+
+* **ci:** restore PR-tagged artifact contract on main ([678fbc3](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/678fbc32fc40ce304d24fda961d42d789eb8440c)), closes [#109](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/109) [#110](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/110) [#110](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/110) [stuttgart-things/stuttgart-things#2176](https://github.com/stuttgart-things/stuttgart-things/issues/2176) [#108](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/108)
+
 # [1.7.0](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.6.5...v1.7.0) (2026-05-13)
 
 
