@@ -1,3 +1,10 @@
+# [1.7.0](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.6.5...v1.7.0) (2026-05-13)
+
+
+### Features
+
+* **ci:** comment preview URL on PR + document PR preview workflow ([a1d6323](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/a1d6323862a56fad8979e8eb4c18c2e829f35c24)), closes [#108](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/108)
+
 ## [1.6.5](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.6.4...v1.6.5) (2026-05-07)
 
 
