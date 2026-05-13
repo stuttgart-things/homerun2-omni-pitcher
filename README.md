@@ -276,6 +276,24 @@ helmfile apply -f \
 
 </details>
 
+## PR preview environments
+
+Every open PR against `main` gets an ephemeral preview environment on `homerun2-dev` — omni-pitcher + redis-stack in an isolated namespace, reachable end-to-end so reviewers can pitch test events against the PR build.
+
+| Event | What happens |
+|---|---|
+| **PR open / push** | CI builds + pushes `ghcr.io/stuttgart-things/homerun2-omni-pitcher:pr-<num>-<sha>` (image) and `homerun2-omni-pitcher-kustomize:pr-<num>-<sha>` (kustomize OCI). A bot comments the preview URL. |
+| **ArgoCD reconcile** (≤10m) | The `homerun2-omni-pitcher-pr-preview` ApplicationSet on `platform-sthings` picks up the PR and renders Applications targeting `homerun2-pr-<num>` namespace on `homerun2-dev`. |
+| **PR merge / close** | The ApplicationSet drops the entry → ArgoCD prunes child Apps + the PR namespace → a cleanup workflow deletes the PR-tagged GHCR package versions. |
+
+**Preview URL pattern**: `https://omni-pr-<num>.homerun2-dev.sthings-vsphere.labul.sva.de`
+
+**Health check**: `/health` against the URL above returns version/commit/date once the pods are Ready.
+
+The pilot uses a shared k3s preview cluster (`homerun2-dev`) with a wildcard Gateway listener and internal-CA TLS. Reviewers need the `cluster-ca` trusted to suppress browser warnings, or accept the self-signed prompt.
+
+Catalog (where the preview chart lives): [`stuttgart-things/argocd` → `apps/homerun2/install`](https://github.com/stuttgart-things/argocd/tree/main/apps/homerun2/install). Tracking issue: [#108](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/108).
+
 ## Development
 
 <details>
