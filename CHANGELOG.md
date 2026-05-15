@@ -1,3 +1,11 @@
+# [1.9.0](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.8.1...v1.9.0) (2026-05-15)
+
+
+### Features
+
+* bounded startup retry for redis health check ([e977c20](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/e977c20ff4e447274366205992df391866360657)), closes [#120](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/120) [#121](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/121)
+* config-driven stream routing with allowlist and matchers ([2ff8bd4](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/2ff8bd45834059c92b2ba969d0c35d4b99992e1f)), closes [#105](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/105)
+
 ## [1.8.1](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.8.0...v1.8.1) (2026-05-13)
 
 
