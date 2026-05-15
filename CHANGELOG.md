@@ -1,3 +1,10 @@
+# [1.11.0](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.10.0...v1.11.0) (2026-05-15)
+
+
+### Features
+
+* ship HTTPRoute in the kustomize OCI base ([8abe315](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/8abe315c2c116e2b1b004eb39ccbe624b07c06a0)), closes [stuttgart-things/argocd#116](https://github.com/stuttgart-things/argocd/issues/116) [stuttgart-things/homerun2-omni-pitcher#116](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/116)
+
 # [1.10.0](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.9.0...v1.10.0) (2026-05-15)
 
 
