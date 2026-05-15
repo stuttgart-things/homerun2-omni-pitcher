@@ -18,7 +18,7 @@ type mockPitcher struct {
 	err error
 }
 
-func (m *mockPitcher) Pitch(_ homerun.Message) (string, string, error) {
+func (m *mockPitcher) Pitch(_ homerun.Message, _ ...string) (string, string, error) {
 	if m.err != nil {
 		return "", "", m.err
 	}
@@ -112,7 +112,7 @@ func TestPitchHandlerValidation(t *testing.T) {
 			req.Header.Set("Content-Type", "application/json")
 
 			rr := httptest.NewRecorder()
-			handler := http.HandlerFunc(handlers.NewPitchHandler(p))
+			handler := http.HandlerFunc(handlers.NewPitchHandler(p, nil))
 			handler.ServeHTTP(rr, req)
 
 			if status := rr.Code; status != tt.expectedStatus {
@@ -142,7 +142,7 @@ func TestPitchHandlerMethodNotAllowed(t *testing.T) {
 	}
 
 	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(handlers.NewPitchHandler(&mockPitcher{}))
+	handler := http.HandlerFunc(handlers.NewPitchHandler(&mockPitcher{}, nil))
 	handler.ServeHTTP(rr, req)
 
 	if status := rr.Code; status != http.StatusMethodNotAllowed {
@@ -158,7 +158,7 @@ func TestPitchHandlerSuccess(t *testing.T) {
 	req.Header.Set("Content-Type", "application/json")
 
 	rr := httptest.NewRecorder()
-	handler := handlers.NewPitchHandler(&mockPitcher{})
+	handler := handlers.NewPitchHandler(&mockPitcher{}, nil)
 	handler.ServeHTTP(rr, req)
 
 	if rr.Code != http.StatusOK {
@@ -186,7 +186,7 @@ func TestPitchHandlerBackendError(t *testing.T) {
 	req.Header.Set("Content-Type", "application/json")
 
 	rr := httptest.NewRecorder()
-	handler := handlers.NewPitchHandler(&mockPitcher{err: fmt.Errorf("connection refused")})
+	handler := handlers.NewPitchHandler(&mockPitcher{err: fmt.Errorf("connection refused")}, nil)
 	handler.ServeHTTP(rr, req)
 
 	if rr.Code != http.StatusServiceUnavailable {

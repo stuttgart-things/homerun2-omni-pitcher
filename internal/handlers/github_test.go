@@ -219,7 +219,7 @@ func TestGitHubPitchHandler(t *testing.T) {
 			}
 
 			rr := httptest.NewRecorder()
-			handler := NewGitHubPitchHandler(tt.pitcher, tt.secret)
+			handler := NewGitHubPitchHandler(tt.pitcher, tt.secret, nil)
 			handler.ServeHTTP(rr, req)
 
 			if rr.Code != tt.expectedStatus {
@@ -254,7 +254,7 @@ func TestGitHubSignatureValidation(t *testing.T) {
 		req.Header.Set("X-Hub-Signature-256", computeSignature(body, secret))
 
 		rr := httptest.NewRecorder()
-		handler := NewGitHubPitchHandler(rp, secret)
+		handler := NewGitHubPitchHandler(rp, secret, nil)
 		handler.ServeHTTP(rr, req)
 
 		if rr.Code != http.StatusOK {
@@ -269,7 +269,7 @@ func TestGitHubSignatureValidation(t *testing.T) {
 		req.Header.Set("X-Hub-Signature-256", "sha256=invalidsignature")
 
 		rr := httptest.NewRecorder()
-		handler := NewGitHubPitchHandler(rp, secret)
+		handler := NewGitHubPitchHandler(rp, secret, nil)
 		handler.ServeHTTP(rr, req)
 
 		if rr.Code != http.StatusUnauthorized {
@@ -283,7 +283,7 @@ func TestGitHubSignatureValidation(t *testing.T) {
 		req.Header.Set("X-GitHub-Event", "issues")
 
 		rr := httptest.NewRecorder()
-		handler := NewGitHubPitchHandler(rp, secret)
+		handler := NewGitHubPitchHandler(rp, secret, nil)
 		handler.ServeHTTP(rr, req)
 
 		if rr.Code != http.StatusUnauthorized {
@@ -297,7 +297,7 @@ func TestGitHubSignatureValidation(t *testing.T) {
 		req.Header.Set("X-GitHub-Event", "issues")
 
 		rr := httptest.NewRecorder()
-		handler := NewGitHubPitchHandler(rp, "")
+		handler := NewGitHubPitchHandler(rp, "", nil)
 		handler.ServeHTTP(rr, req)
 
 		if rr.Code != http.StatusOK {
@@ -328,7 +328,7 @@ func TestGitHubEventMapping(t *testing.T) {
 		req, _ := http.NewRequest(http.MethodPost, "/pitch/github", bytes.NewBuffer(body))
 		req.Header.Set("X-GitHub-Event", "push")
 		rr := httptest.NewRecorder()
-		NewGitHubPitchHandler(rp, "").ServeHTTP(rr, req)
+		NewGitHubPitchHandler(rp, "", nil).ServeHTTP(rr, req)
 
 		if len(rp.messages) != 1 {
 			t.Fatalf("expected 1 message, got %d", len(rp.messages))
@@ -365,7 +365,7 @@ func TestGitHubEventMapping(t *testing.T) {
 		req, _ := http.NewRequest(http.MethodPost, "/pitch/github", bytes.NewBuffer(body))
 		req.Header.Set("X-GitHub-Event", "pull_request")
 		rr := httptest.NewRecorder()
-		NewGitHubPitchHandler(rp, "").ServeHTTP(rr, req)
+		NewGitHubPitchHandler(rp, "", nil).ServeHTTP(rr, req)
 
 		if rp.messages[0].Severity != "success" {
 			t.Errorf("expected severity 'success', got '%s'", rp.messages[0].Severity)
@@ -389,7 +389,7 @@ func TestGitHubEventMapping(t *testing.T) {
 		req, _ := http.NewRequest(http.MethodPost, "/pitch/github", bytes.NewBuffer(body))
 		req.Header.Set("X-GitHub-Event", "workflow_run")
 		rr := httptest.NewRecorder()
-		NewGitHubPitchHandler(rp, "").ServeHTTP(rr, req)
+		NewGitHubPitchHandler(rp, "", nil).ServeHTTP(rr, req)
 
 		if rp.messages[0].Severity != "critical" {
 			t.Errorf("expected severity 'critical', got '%s'", rp.messages[0].Severity)
@@ -413,7 +413,7 @@ func TestGitHubEventMapping(t *testing.T) {
 		req, _ := http.NewRequest(http.MethodPost, "/pitch/github", bytes.NewBuffer(body))
 		req.Header.Set("X-GitHub-Event", "release")
 		rr := httptest.NewRecorder()
-		NewGitHubPitchHandler(rp, "").ServeHTTP(rr, req)
+		NewGitHubPitchHandler(rp, "", nil).ServeHTTP(rr, req)
 
 		if rp.messages[0].Artifacts != "v2.0.0" {
 			t.Errorf("expected artifacts 'v2.0.0', got '%s'", rp.messages[0].Artifacts)

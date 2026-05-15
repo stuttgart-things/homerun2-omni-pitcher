@@ -170,7 +170,8 @@ Returns `200 OK` when the service is running.
 | `PORT`          | `8080`                                       | HTTP server port         |
 | `REDIS_ADDR`    | `redis-stack.homerun2.svc.cluster.local`     | Redis server address     |
 | `REDIS_PORT`    | `6379`                                       | Redis server port        |
-| `REDIS_STREAM`  | `messages`                                   | Redis stream name        |
+| `REDIS_STREAM`  | `messages`                                   | Redis stream name (used when `ROUTES_CONFIG` is unset) |
+| `ROUTES_CONFIG` | (empty)                                      | Path to YAML stream-routing config; see [Stream routing](../README.md#stream-routing) in the README |
 | `REDIS_SEARCH_INDEX` | (empty)                                 | RediSearch index name (enables dual-write) |
 | `GITHUB_WEBHOOK_SECRET` | (empty)                              | HMAC secret for GitHub webhook validation |
 | `AUTH_TOKEN`    | (required)                                   | Bearer token for auth    |

@@ -14,8 +14,11 @@ import (
 )
 
 // Pitcher defines the interface for message delivery backends.
+// If streamOverride is provided and non-empty, the first value selects the
+// destination Redis stream for this message; otherwise the backend's default
+// stream is used.
 type Pitcher interface {
-	Pitch(msg homerun.Message) (objectID, streamID string, err error)
+	Pitch(msg homerun.Message, streamOverride ...string) (objectID, streamID string, err error)
 }
 
 // RedisPitcher enqueues messages into Redis Streams.
@@ -37,8 +40,8 @@ func (p *RedisPitcher) HealthCheck(ctx context.Context) error {
 	return nil
 }
 
-func (p *RedisPitcher) Pitch(msg homerun.Message) (string, string, error) {
-	objectID, streamID, err := homerun.EnqueueMessageInRedisStreams(msg, p.Config)
+func (p *RedisPitcher) Pitch(msg homerun.Message, streamOverride ...string) (string, string, error) {
+	objectID, streamID, err := homerun.EnqueueMessageInRedisStreams(msg, p.Config, streamOverride...)
 	if err != nil {
 		return "", "", fmt.Errorf("failed to enqueue message to Redis stream: %w", err)
 	}
@@ -61,7 +64,7 @@ type FilePitcher struct {
 	mu   sync.Mutex
 }
 
-func (p *FilePitcher) Pitch(msg homerun.Message) (string, string, error) {
+func (p *FilePitcher) Pitch(msg homerun.Message, streamOverride ...string) (string, string, error) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 
@@ -73,6 +76,9 @@ func (p *FilePitcher) Pitch(msg homerun.Message) (string, string, error) {
 
 	objectID := fmt.Sprintf("file-%d", time.Now().UnixNano())
 	streamID := "file"
+	if len(streamOverride) > 0 && streamOverride[0] != "" {
+		streamID = streamOverride[0]
+	}
 
 	entry := map[string]any{
 		"objectID":  objectID,

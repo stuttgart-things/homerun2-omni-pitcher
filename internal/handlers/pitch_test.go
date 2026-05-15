@@ -20,7 +20,7 @@ type mockPitcher struct {
 	err      error
 }
 
-func (m *mockPitcher) Pitch(_ homerun.Message) (string, string, error) {
+func (m *mockPitcher) Pitch(_ homerun.Message, _ ...string) (string, string, error) {
 	return m.objectID, m.streamID, m.err
 }
 
@@ -159,7 +159,7 @@ func TestPitchHandler(t *testing.T) {
 			req.Header.Set("Content-Type", "application/json")
 
 			rr := httptest.NewRecorder()
-			handler := NewPitchHandler(tt.pitcher)
+			handler := NewPitchHandler(tt.pitcher, nil)
 			handler.ServeHTTP(rr, req)
 
 			if status := rr.Code; status != tt.expectedStatus {
