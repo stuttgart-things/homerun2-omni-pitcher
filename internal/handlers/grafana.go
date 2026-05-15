@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/metrics"
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/models"
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/pitcher"
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/routing"
@@ -20,6 +21,7 @@ import (
 // If router is non-nil, the resolved stream is passed as a per-request override.
 func NewGrafanaPitchHandler(p pitcher.Pitcher, router *routing.Router) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
 		if r.Method != http.MethodPost {
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 			return
@@ -27,11 +29,15 @@ func NewGrafanaPitchHandler(p pitcher.Pitcher, router *routing.Router) http.Hand
 
 		var payload models.GrafanaWebhookPayload
 		if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
+			metrics.RecordPitch(metrics.SourceGrafana, "", metrics.StatusError)
+			metrics.ObservePitchDuration(metrics.SourceGrafana, start)
 			respondWithError(w, http.StatusBadRequest, "Invalid Grafana webhook payload")
 			return
 		}
 
 		if len(payload.Alerts) == 0 {
+			metrics.RecordPitch(metrics.SourceGrafana, "", metrics.StatusError)
+			metrics.ObservePitchDuration(metrics.SourceGrafana, start)
 			respondWithError(w, http.StatusBadRequest, "No alerts in payload")
 			return
 		}
@@ -45,10 +51,13 @@ func NewGrafanaPitchHandler(p pitcher.Pitcher, router *routing.Router) http.Hand
 			stream := router.Resolve(r.URL.Path, msg)
 			objectID, streamID, err := p.Pitch(msg, stream)
 			if err != nil {
+				metrics.RecordPitch(metrics.SourceGrafana, msg.Severity, metrics.StatusError)
 				slog.Error("failed to pitch grafana alert", "error", err, "fingerprint", alert.Fingerprint)
 				errors = append(errors, fmt.Sprintf("alert %s: %v", alert.Fingerprint, err))
 				continue
 			}
+
+			metrics.RecordPitch(metrics.SourceGrafana, msg.Severity, metrics.StatusSuccess)
 
 			results = append(results, models.PitchResponse{
 				ObjectID: objectID,
@@ -61,6 +70,7 @@ func NewGrafanaPitchHandler(p pitcher.Pitcher, router *routing.Router) http.Hand
 		}
 
 		if len(errors) > 0 && len(results) == 0 {
+			metrics.ObservePitchDuration(metrics.SourceGrafana, start)
 			respondWithJSON(w, http.StatusServiceUnavailable, map[string]any{
 				"status":  "error",
 				"message": "Failed to enqueue all alerts",
@@ -69,6 +79,7 @@ func NewGrafanaPitchHandler(p pitcher.Pitcher, router *routing.Router) http.Hand
 			return
 		}
 
+		metrics.ObservePitchDuration(metrics.SourceGrafana, start)
 		respondWithJSON(w, http.StatusOK, map[string]any{
 			"status":   "success",
 			"message":  fmt.Sprintf("%d of %d alerts enqueued", len(results), len(payload.Alerts)),

@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/metrics"
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/models"
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/pitcher"
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/routing"
@@ -25,6 +26,7 @@ import (
 // If router is non-nil, the resolved stream is passed as a per-request override.
 func NewGitHubPitchHandler(p pitcher.Pitcher, webhookSecret string, router *routing.Router) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
 		if r.Method != http.MethodPost {
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 			return
@@ -32,6 +34,8 @@ func NewGitHubPitchHandler(p pitcher.Pitcher, webhookSecret string, router *rout
 
 		body, err := io.ReadAll(r.Body)
 		if err != nil {
+			metrics.RecordPitch(metrics.SourceGitHub, "", metrics.StatusError)
+			metrics.ObservePitchDuration(metrics.SourceGitHub, start)
 			respondWithError(w, http.StatusBadRequest, "Failed to read request body")
 			return
 		}
@@ -40,6 +44,8 @@ func NewGitHubPitchHandler(p pitcher.Pitcher, webhookSecret string, router *rout
 		if webhookSecret != "" {
 			signature := r.Header.Get("X-Hub-Signature-256")
 			if !validateGitHubSignature(body, signature, webhookSecret) {
+				metrics.RecordPitch(metrics.SourceGitHub, "", metrics.StatusError)
+				metrics.ObservePitchDuration(metrics.SourceGitHub, start)
 				respondWithError(w, http.StatusUnauthorized, "Invalid webhook signature")
 				return
 			}
@@ -47,12 +53,15 @@ func NewGitHubPitchHandler(p pitcher.Pitcher, webhookSecret string, router *rout
 
 		eventType := r.Header.Get("X-GitHub-Event")
 		if eventType == "" {
+			metrics.RecordPitch(metrics.SourceGitHub, "", metrics.StatusError)
+			metrics.ObservePitchDuration(metrics.SourceGitHub, start)
 			respondWithError(w, http.StatusBadRequest, "Missing X-GitHub-Event header")
 			return
 		}
 
 		// Handle ping event (GitHub sends this when webhook is first configured)
 		if eventType == "ping" {
+			metrics.ObservePitchDuration(metrics.SourceGitHub, start)
 			respondWithJSON(w, http.StatusOK, map[string]string{
 				"status":  "success",
 				"message": "pong",
@@ -62,6 +71,8 @@ func NewGitHubPitchHandler(p pitcher.Pitcher, webhookSecret string, router *rout
 
 		var payload models.GitHubWebhookPayload
 		if err := json.Unmarshal(body, &payload); err != nil {
+			metrics.RecordPitch(metrics.SourceGitHub, "", metrics.StatusError)
+			metrics.ObservePitchDuration(metrics.SourceGitHub, start)
 			respondWithError(w, http.StatusBadRequest, "Invalid GitHub webhook payload")
 			return
 		}
@@ -71,10 +82,15 @@ func NewGitHubPitchHandler(p pitcher.Pitcher, webhookSecret string, router *rout
 		stream := router.Resolve(r.URL.Path, msg)
 		objectID, streamID, err := p.Pitch(msg, stream)
 		if err != nil {
+			metrics.RecordPitch(metrics.SourceGitHub, msg.Severity, metrics.StatusError)
+			metrics.ObservePitchDuration(metrics.SourceGitHub, start)
 			slog.Error("failed to pitch github event", "error", err, "event", eventType)
 			respondWithError(w, http.StatusServiceUnavailable, "Failed to enqueue event")
 			return
 		}
+
+		metrics.RecordPitch(metrics.SourceGitHub, msg.Severity, metrics.StatusSuccess)
+		metrics.ObservePitchDuration(metrics.SourceGitHub, start)
 
 		respondWithJSON(w, http.StatusOK, models.PitchResponse{
 			ObjectID: objectID,

@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/metrics"
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/models"
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/pitcher"
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/routing"
@@ -17,6 +18,7 @@ import (
 // If router is non-nil, the resolved stream is passed as a per-request override.
 func NewPitchHandler(p pitcher.Pitcher, router *routing.Router) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
 		if r.Method != http.MethodPost {
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 			return
@@ -24,16 +26,22 @@ func NewPitchHandler(p pitcher.Pitcher, router *routing.Router) http.HandlerFunc
 
 		var msg homerun.Message
 		if err := json.NewDecoder(r.Body).Decode(&msg); err != nil {
+			metrics.RecordPitch(metrics.SourceRaw, "", metrics.StatusError)
+			metrics.ObservePitchDuration(metrics.SourceRaw, start)
 			respondWithError(w, http.StatusBadRequest, "Invalid JSON payload")
 			return
 		}
 
 		// Validate required fields
 		if msg.Title == "" {
+			metrics.RecordPitch(metrics.SourceRaw, msg.Severity, metrics.StatusError)
+			metrics.ObservePitchDuration(metrics.SourceRaw, start)
 			respondWithError(w, http.StatusBadRequest, "Title is required")
 			return
 		}
 		if msg.Message == "" {
+			metrics.RecordPitch(metrics.SourceRaw, msg.Severity, metrics.StatusError)
+			metrics.ObservePitchDuration(metrics.SourceRaw, start)
 			respondWithError(w, http.StatusBadRequest, "Message is required")
 			return
 		}
@@ -55,10 +63,15 @@ func NewPitchHandler(p pitcher.Pitcher, router *routing.Router) http.HandlerFunc
 		stream := router.Resolve(r.URL.Path, msg)
 		objectID, streamID, err := p.Pitch(msg, stream)
 		if err != nil {
+			metrics.RecordPitch(metrics.SourceRaw, msg.Severity, metrics.StatusError)
+			metrics.ObservePitchDuration(metrics.SourceRaw, start)
 			slog.Error("failed to pitch message", "error", err)
 			respondWithError(w, http.StatusServiceUnavailable, "Failed to enqueue message")
 			return
 		}
+
+		metrics.RecordPitch(metrics.SourceRaw, msg.Severity, metrics.StatusSuccess)
+		metrics.ObservePitchDuration(metrics.SourceRaw, start)
 
 		respondWithJSON(w, http.StatusOK, models.PitchResponse{
 			ObjectID: objectID,
