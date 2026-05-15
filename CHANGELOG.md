@@ -1,3 +1,10 @@
+# [1.10.0](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.9.0...v1.10.0) (2026-05-15)
+
+
+### Features
+
+* expose Prometheus /metrics endpoint ([e85fbc9](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/e85fbc90a1b871095ef9717c8e4d75d14de3781e))
+
 # [1.9.0](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.8.1...v1.9.0) (2026-05-15)
 
 
