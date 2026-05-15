@@ -44,8 +44,12 @@ func main() {
 		redisConfig := config.LoadRedisConfig()
 		rp := &pitcher.RedisPitcher{Config: redisConfig}
 
-		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-		if err := rp.HealthCheck(ctx); err != nil {
+		// Bounded retry loop for the startup redis health check. Smooths over
+		// short readiness races (e.g. Cilium identity propagation in a fresh
+		// per-PR namespace, see #121) without masking genuine misconfig — the
+		// process still fails fast once the 30s budget expires.
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		if err := pitcher.WaitForReady(ctx, rp.HealthCheck, 5*time.Second); err != nil {
 			slog.Error("redis health check failed", "error", err, "addr", redisConfig.Addr, "port", redisConfig.Port)
 			cancel()
 			os.Exit(1)
