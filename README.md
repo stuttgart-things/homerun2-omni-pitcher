@@ -319,7 +319,7 @@ When `ROUTES_CONFIG` is unset, the legacy single-stream behavior is preserved (e
 
 ## PR preview environments
 
-Every open PR against `main` gets an ephemeral preview environment on `homerun2-dev` — omni-pitcher + redis-stack in an isolated namespace, reachable end-to-end so reviewers can pitch test events against the PR build.
+Every open PR against `main` carrying the `preview` label gets an ephemeral preview environment on `homerun2-dev` — omni-pitcher + redis-stack in an isolated namespace, reachable end-to-end so reviewers can pitch test events against the PR build.
 
 | Event | What happens |
 |---|---|
