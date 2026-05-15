@@ -323,8 +323,8 @@ Every open PR against `main` carrying the `preview` label gets an ephemeral prev
 
 | Event | What happens |
 |---|---|
-| **PR open / push** | CI builds + pushes `ghcr.io/stuttgart-things/homerun2-omni-pitcher:pr-<num>-<sha>` (image) and `homerun2-omni-pitcher-kustomize:pr-<num>-<sha>` (kustomize OCI). A bot comments the preview URL. |
-| **ArgoCD reconcile** (≤10m) | The `homerun2-omni-pitcher-pr-preview` ApplicationSet on `platform-sthings` picks up the PR and renders Applications targeting `homerun2-pr-<num>` namespace on `homerun2-dev`. |
+| **PR open / push** | CI builds + pushes `ghcr.io/stuttgart-things/homerun2-omni-pitcher:pr-<num>-<sha>` (image) and `homerun2-omni-pitcher-kustomize:pr-<num>-<sha>` (kustomize OCI, includes the HTTPRoute alongside the Service). A bot comments the preview URL. |
+| **ArgoCD reconcile** (≤10m) | The `homerun2-omni-pitcher-pr-preview` ApplicationSet on `platform-sthings` picks up the PR and renders Applications targeting the `homerun2-pr-<num>` namespace on `homerun2-dev`. |
 | **PR merge / close** | The ApplicationSet drops the entry → ArgoCD prunes child Apps + the PR namespace → a cleanup workflow deletes the PR-tagged GHCR package versions. |
 
 **Preview URL pattern**: `https://omni-pr-<num>.homerun2-dev.sthings-vsphere.labul.sva.de`
