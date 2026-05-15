@@ -8,12 +8,14 @@ import (
 
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/models"
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/pitcher"
+	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/routing"
 
 	homerun "github.com/stuttgart-things/homerun-library/v3"
 )
 
 // NewPitchHandler creates a pitch handler with the given Pitcher backend.
-func NewPitchHandler(p pitcher.Pitcher) http.HandlerFunc {
+// If router is non-nil, the resolved stream is passed as a per-request override.
+func NewPitchHandler(p pitcher.Pitcher, router *routing.Router) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -50,7 +52,8 @@ func NewPitchHandler(p pitcher.Pitcher) http.HandlerFunc {
 			msg.System = "homerun2-omni-pitcher"
 		}
 
-		objectID, streamID, err := p.Pitch(msg)
+		stream := router.Resolve(r.URL.Path, msg)
+		objectID, streamID, err := p.Pitch(msg, stream)
 		if err != nil {
 			slog.Error("failed to pitch message", "error", err)
 			respondWithError(w, http.StatusServiceUnavailable, "Failed to enqueue message")

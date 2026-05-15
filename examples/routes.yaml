@@ -1,0 +1,38 @@
+# Example routing config consumed by omni-pitcher when ROUTES_CONFIG is set.
+# See README.md "Stream routing" for the full schema and semantics.
+
+# Allowlist of valid destination streams. Any route or default targeting a
+# stream not in this list fails startup.
+streams:
+  - messages
+  - github-events
+  - grafana-alerts
+  - releases
+
+# Fallback stream when no rule matches. Must be in `streams`.
+default_stream: messages
+
+# Ordered rule list — first match wins. All matchers within a single rule
+# must match (AND semantics). All matchers are substring (no regex).
+routes:
+  # GitHub webhook traffic — routed by the URL path the request landed on.
+  - match:
+      endpoint: /pitch/github
+    stream: github-events
+
+  # Grafana alerts — webhook payload sets Message.System = receiver name.
+  - match:
+      system: grafana
+    stream: grafana-alerts
+
+  # Release announcements — any tag containing "release".
+  - match:
+      tag_contains: release
+    stream: releases
+
+  # Combined matchers (AND) — only push events that mention errors land here.
+  # Falls through to default_stream if any matcher misses.
+  - match:
+      endpoint: /pitch/github
+      title_contains: [error, failure]
+    stream: grafana-alerts

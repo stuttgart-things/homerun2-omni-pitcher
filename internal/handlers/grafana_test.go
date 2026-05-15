@@ -20,7 +20,7 @@ type recordingPitcher struct {
 	err      error
 }
 
-func (r *recordingPitcher) Pitch(msg homerun.Message) (string, string, error) {
+func (r *recordingPitcher) Pitch(msg homerun.Message, _ ...string) (string, string, error) {
 	if r.err != nil {
 		return "", "", r.err
 	}
@@ -154,7 +154,7 @@ func TestGrafanaPitchHandler(t *testing.T) {
 			req.Header.Set("Content-Type", "application/json")
 
 			rr := httptest.NewRecorder()
-			handler := NewGrafanaPitchHandler(tt.pitcher)
+			handler := NewGrafanaPitchHandler(tt.pitcher, nil)
 			handler.ServeHTTP(rr, req)
 
 			if rr.Code != tt.expectedStatus {
@@ -308,7 +308,7 @@ func TestGrafanaPitchHandlerRecordedMessages(t *testing.T) {
 	req.Header.Set("Content-Type", "application/json")
 
 	rr := httptest.NewRecorder()
-	handler := NewGrafanaPitchHandler(rp)
+	handler := NewGrafanaPitchHandler(rp, nil)
 	handler.ServeHTTP(rr, req)
 
 	if rr.Code != http.StatusOK {

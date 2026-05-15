@@ -15,6 +15,7 @@ import (
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/handlers"
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/middleware"
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/pitcher"
+	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/routing"
 
 	homerun "github.com/stuttgart-things/homerun-library/v3"
 )
@@ -32,6 +33,24 @@ func main() {
 
 	port := homerun.GetEnv("PORT", "8080")
 	mode := homerun.GetEnv("PITCHER_MODE", "redis")
+
+	// Optional config-driven stream routing (#105). Unset = legacy single-stream
+	// path: rc.Stream / REDIS_STREAM is used for every message.
+	var router *routing.Router
+	if routesPath := homerun.GetEnv("ROUTES_CONFIG", ""); routesPath != "" {
+		cfg, err := routing.Load(routesPath)
+		if err != nil {
+			slog.Error("failed to load routing config", "path", routesPath, "error", err)
+			os.Exit(1)
+		}
+		router = routing.New(cfg)
+		slog.Info("stream routing enabled",
+			"path", routesPath,
+			"streams", router.Streams(),
+			"default_stream", router.DefaultStream(),
+			"routes", len(router.Routes()),
+		)
+	}
 
 	// Select pitcher backend
 	var p pitcher.Pitcher
@@ -101,11 +120,11 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/health", handlers.NewHealthHandler(buildInfo))
-	mux.HandleFunc("/pitch", authMiddleware(handlers.NewPitchHandler(p)))
-	mux.HandleFunc("/pitch/grafana", authMiddleware(handlers.NewGrafanaPitchHandler(p)))
+	mux.HandleFunc("/pitch", authMiddleware(handlers.NewPitchHandler(p, router)))
+	mux.HandleFunc("/pitch/grafana", authMiddleware(handlers.NewGrafanaPitchHandler(p, router)))
 
 	githubWebhookSecret := homerun.GetEnv("GITHUB_WEBHOOK_SECRET", "")
-	mux.HandleFunc("/pitch/github", authMiddleware(handlers.NewGitHubPitchHandler(p, githubWebhookSecret)))
+	mux.HandleFunc("/pitch/github", authMiddleware(handlers.NewGitHubPitchHandler(p, githubWebhookSecret, router)))
 
 	srv := &http.Server{
 		Addr:    ":" + port,

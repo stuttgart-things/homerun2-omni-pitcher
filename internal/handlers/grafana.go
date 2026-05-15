@@ -10,13 +10,15 @@ import (
 
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/models"
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/pitcher"
+	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/routing"
 
 	homerun "github.com/stuttgart-things/homerun-library/v3"
 )
 
 // NewGrafanaPitchHandler creates a handler that accepts Grafana webhook payloads
 // and converts each alert into a homerun.Message for pitching.
-func NewGrafanaPitchHandler(p pitcher.Pitcher) http.HandlerFunc {
+// If router is non-nil, the resolved stream is passed as a per-request override.
+func NewGrafanaPitchHandler(p pitcher.Pitcher, router *routing.Router) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -40,7 +42,8 @@ func NewGrafanaPitchHandler(p pitcher.Pitcher) http.HandlerFunc {
 		for _, alert := range payload.Alerts {
 			msg := grafanaAlertToMessage(alert, payload)
 
-			objectID, streamID, err := p.Pitch(msg)
+			stream := router.Resolve(r.URL.Path, msg)
+			objectID, streamID, err := p.Pitch(msg, stream)
 			if err != nil {
 				slog.Error("failed to pitch grafana alert", "error", err, "fingerprint", alert.Fingerprint)
 				errors = append(errors, fmt.Sprintf("alert %s: %v", alert.Fingerprint, err))

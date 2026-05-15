@@ -276,6 +276,46 @@ helmfile apply -f \
 
 </details>
 
+## Stream routing
+
+By default omni-pitcher writes every message to a single Redis stream (`REDIS_STREAM`, default `messages`). Set the `ROUTES_CONFIG` env var to a YAML file path to route messages to different streams based on which endpoint received them or what they contain.
+
+```yaml
+# routes.yaml
+streams:                # allowlist of valid destination streams
+  - messages
+  - github-events
+  - grafana-alerts
+  - releases
+default_stream: messages  # fallback when no rule matches; must be in `streams`
+routes:                   # ordered; first match wins, AND inside a rule
+  - match: { endpoint: /pitch/github }
+    stream: github-events
+  - match: { system: grafana }
+    stream: grafana-alerts
+  - match: { tag_contains: release }
+    stream: releases
+```
+
+Available matchers (all substring, no regex):
+
+| Matcher | Matches against |
+|---|---|
+| `endpoint` | Request URL path (e.g. `/pitch/github`) |
+| `system` | `Message.System` |
+| `author` | `Message.Author` |
+| `tag_contains` | `Message.Tags` |
+| `title_contains` | `Message.Title` (list — any match wins) |
+
+Rules are evaluated top-to-bottom; **first match wins**. Inside a rule, all declared matchers must match (**AND**). If no rule matches, the message goes to `default_stream`.
+
+Misconfiguration fails startup. Specifically:
+- `streams` must be non-empty and unique
+- `default_stream` and every `routes[*].stream` must be in `streams`
+- every rule must declare at least one matcher
+
+When `ROUTES_CONFIG` is unset, the legacy single-stream behavior is preserved (everything goes to `REDIS_STREAM`). See [`examples/routes.yaml`](examples/routes.yaml) for a full example.
+
 ## PR preview environments
 
 Every open PR against `main` gets an ephemeral preview environment on `homerun2-dev` — omni-pitcher + redis-stack in an isolated namespace, reachable end-to-end so reviewers can pitch test events against the PR build.

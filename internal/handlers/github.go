@@ -14,6 +14,7 @@ import (
 
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/models"
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/pitcher"
+	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/routing"
 
 	homerun "github.com/stuttgart-things/homerun-library/v3"
 )
@@ -21,7 +22,8 @@ import (
 // NewGitHubPitchHandler creates a handler that accepts GitHub webhook payloads
 // and converts them into homerun.Message for pitching.
 // If webhookSecret is non-empty, the handler validates X-Hub-Signature-256.
-func NewGitHubPitchHandler(p pitcher.Pitcher, webhookSecret string) http.HandlerFunc {
+// If router is non-nil, the resolved stream is passed as a per-request override.
+func NewGitHubPitchHandler(p pitcher.Pitcher, webhookSecret string, router *routing.Router) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -66,7 +68,8 @@ func NewGitHubPitchHandler(p pitcher.Pitcher, webhookSecret string) http.Handler
 
 		msg := githubEventToMessage(eventType, payload)
 
-		objectID, streamID, err := p.Pitch(msg)
+		stream := router.Resolve(r.URL.Path, msg)
+		objectID, streamID, err := p.Pitch(msg, stream)
 		if err != nil {
 			slog.Error("failed to pitch github event", "error", err, "event", eventType)
 			respondWithError(w, http.StatusServiceUnavailable, "Failed to enqueue event")
