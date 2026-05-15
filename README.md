@@ -10,6 +10,7 @@ A Go HTTP microservice that accepts JSON messages via `POST /pitch` and enqueues
 | Endpoint | Method | Auth | Description |
 |----------|--------|------|-------------|
 | `/health` | `GET` | None | Health check (returns version, commit, date) |
+| `/metrics` | `GET` | None | Prometheus exposition (counters/histograms partitioned by source + severity, Go runtime metrics) |
 | `/pitch` | `POST` | Bearer token or JWT | Submit a message to Redis Streams or file |
 | `/pitch/grafana` | `POST` | Bearer token or JWT | Accept Grafana webhook alerts and enqueue as messages |
 | `/pitch/github` | `POST` | Bearer token or JWT | Accept GitHub webhook events and enqueue as messages |

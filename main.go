@@ -13,10 +13,12 @@ import (
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/banner"
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/config"
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/handlers"
+	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/metrics"
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/middleware"
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/pitcher"
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/routing"
 
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	homerun "github.com/stuttgart-things/homerun-library/v3"
 )
 
@@ -121,9 +123,11 @@ func main() {
 	)
 
 	buildInfo := handlers.BuildInfo{Version: version, Commit: commit, Date: date}
+	metrics.SetBuildInfo(version, commit)
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/health", handlers.NewHealthHandler(buildInfo))
+	mux.Handle("/metrics", promhttp.Handler())
 	mux.HandleFunc("/pitch", authMiddleware(handlers.NewPitchHandler(p, router)))
 	mux.HandleFunc("/pitch/grafana", authMiddleware(handlers.NewGrafanaPitchHandler(p, router)))
 
