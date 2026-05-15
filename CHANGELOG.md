@@ -1,3 +1,10 @@
+## [1.11.1](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.11.0...v1.11.1) (2026-05-15)
+
+
+### Bug Fixes
+
+* **kcl:** render admission-webhook defaults on HTTPRoute ([e33b99d](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/e33b99df3bcd29a876b97361202b718582724b62)), closes [stuttgart-things/argocd#114](https://github.com/stuttgart-things/argocd/issues/114)
+
 # [1.11.0](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.10.0...v1.11.0) (2026-05-15)
 
 
