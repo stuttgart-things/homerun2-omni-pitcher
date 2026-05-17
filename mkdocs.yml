@@ -6,6 +6,7 @@ nav:
   - API Usage: api-usage.md
   - Deployment: deployment.md
   - CI/CD: cicd.md
+  - Preview Environments: preview-environments.md
 
 plugins:
   - techdocs-core
