@@ -1,6 +1,6 @@
 # homerun2-omni-pitcher
 
-A Go HTTP microservice that accepts JSON messages via `POST /pitch` and enqueues them into Redis Streams using the [homerun-library](https://github.com/stuttgart-things/homerun-library).
+A Go HTTP microservice that accepts JSON messages via `POST /pitch` and enqueues them into Redis Streams using [homerun-library](https://github.com/stuttgart-things/homerun-library).
 
 [![Build & Test](https://github.com/stuttgart-things/homerun2-omni-pitcher/actions/workflows/build-test.yaml/badge.svg)](https://github.com/stuttgart-things/homerun2-omni-pitcher/actions/workflows/build-test.yaml)
 [![Docs](https://img.shields.io/badge/docs-pages-blue)](https://stuttgart-things.github.io/homerun2-omni-pitcher/)
