@@ -6,6 +6,7 @@
 streams:
   - messages
   - github-events
+  - alerts
   - grafana-alerts
   - releases
 
@@ -20,7 +21,17 @@ routes:
       endpoint: /pitch/github
     stream: github-events
 
-  # Grafana alerts — webhook payload sets Message.System = receiver name.
+  # Alertmanager + Grafana webhooks for the homerun2-notification-catcher
+  # pipeline. Endpoint-based routing is more robust than label-based for
+  # this case because Alertmanager sets `receiver` to whatever name lives in
+  # the AM config (e.g. "msteams"), not "grafana".
+  # See: stuttgart-things/homerun2-notification-catcher (issue #9).
+  - match:
+      endpoint: /pitch/grafana
+    stream: alerts
+
+  # Legacy Grafana-only path — kept for setups that don't run
+  # notification-catcher. Payload sets Message.System = receiver name.
   - match:
       system: grafana
     stream: grafana-alerts
