@@ -1,3 +1,10 @@
+## [1.11.2](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.11.1...v1.11.2) (2026-05-28)
+
+
+### Bug Fixes
+
+* **kcl:** stop emitting Namespace from kustomize OCI ([4ee02a2](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/4ee02a245e175b9a0006dd0dc591dd0da1787ad2)), closes [#132](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/132)
+
 ## [1.11.1](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.11.0...v1.11.1) (2026-05-15)
 
 
