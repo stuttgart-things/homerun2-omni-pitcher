@@ -17,6 +17,10 @@ jobs:
       runs-on: ubuntu-latest
       go-version: "1.26.6"
       stage-image: true
+      # Moves :latest onto every release. Without it the pipeline only ever
+      # writes the version tag, and :latest was never published at all — the
+      # tag 404'd while releases reached v1.12.x (#165).
+      image-extra-tags: latest
       push-kustomize: true
       kcl-source-dir: kcl
       kcl-profile-file: tests/kcl-deploy-profile.yaml
