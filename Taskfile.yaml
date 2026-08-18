@@ -31,6 +31,7 @@ vars:
   KCL_PROFILE_FILE: tests/kcl-deploy-profile.yaml
   RENDERED_OUTPUT_PATH: /tmp/rendered-{{ .PROJECT }}.yaml
   LINT_REPORT_PATH: /tmp/lint-report-{{ .PROJECT }}.txt
+  GOVULN_REPORT_PATH: /tmp/govulncheck-report-{{ .PROJECT }}.txt
   TEST_REPORT_PATH: /tmp/test-report-{{ .PROJECT }}.txt
   KUSTOMIZE_BASE_EXPORT_PATH: /tmp/kustomize-base-{{ .PROJECT }}
   KUSTOMIZE_OCI_REPO: ghcr.io/{{ .ORGA_NAME }}/{{ .PROJECT }}-kustomize
@@ -59,6 +60,21 @@ tasks:
           --src "{{ .SOURCE_CODE_DIR }}" \
           export --path={{ .LINT_REPORT_PATH }} \
           --progress plain
+
+  govulncheck:
+    desc: Report Go dependency vulnerabilities reachable from this code
+    vars:
+      FAIL: '{{ .FAIL | default "false" }}'
+    cmds:
+      - |
+        dagger call -m {{ .DAGGER_MODULE_DIR }} govulncheck \
+          --src "{{ .SOURCE_CODE_DIR }}" \
+          {{ if eq .FAIL "true" }}--fail-on-vuln{{ end }} \
+          --progress plain \
+          export --path={{ .GOVULN_REPORT_PATH }}
+
+        echo "Report: {{ .GOVULN_REPORT_PATH }}"
+        tail -5 {{ .GOVULN_REPORT_PATH }}
 
   ci-run-linting:
     desc: Run repository linting via Dagger blueprint
