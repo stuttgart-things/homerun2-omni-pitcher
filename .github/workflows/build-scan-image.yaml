@@ -30,6 +30,11 @@ jobs:
     with:
       runs-on: ubuntu-latest
       go-version: "1.26.6"
+      # Without these, call-ko-build falls back to its ttl.sh/latest defaults
+      # and main images never reach ghcr.io — which left :main stale for
+      # months while the docs claimed otherwise (#157).
+      registry: ghcr.io
+      tags: main
     secrets: inherit # pragma: allowlist secret
 
   # Trivy scans the image call-ko-build just pushed, via its image-ref output.

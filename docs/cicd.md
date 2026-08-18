@@ -7,7 +7,7 @@
 | Workflow | Trigger | Description |
 |----------|---------|-------------|
 | `build-test.yaml` | PR / push to main | Dagger lint + build + test |
-| `build-scan-image.yaml` | PR / push to main | ko build, then Trivy image scan (`HIGH,CRITICAL`, report-only — see [#158](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/158)); PR job tags `pr-<num>-<sha>` for preview envs and pushes to `ghcr.io`. The main job currently pushes to `ttl.sh`, not `ghcr.io` — see [#157](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/157) |
+| `build-scan-image.yaml` | PR / push to main | ko build, then Trivy image scan (`HIGH,CRITICAL`, report-only — see [#158](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/158)). Both jobs push to `ghcr.io`: the PR job tags `pr-<num>-<sha>` + `pr-<num>` for preview envs, the main job tags `:main` |
 | `release.yaml` | After image build / manual | Semantic release + stage image + push kustomize OCI |
 | `pages.yaml` | After release / manual | Deploy MkDocs to GitHub Pages |
 | `lint-repo.yaml` | PR / push to main | Repository linting |
