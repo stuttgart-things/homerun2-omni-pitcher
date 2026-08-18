@@ -1,3 +1,10 @@
+# [1.12.0](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.11.10...v1.12.0) (2026-08-18)
+
+
+### Features
+
+* **ci:** add govulncheck ([f735cae](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/f735caebf486d153164c860581de633c01f59d5e)), closes [#158](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/158) [#151](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/151)
+
 ## [1.11.10](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.11.9...v1.11.10) (2026-08-18)
 
 
