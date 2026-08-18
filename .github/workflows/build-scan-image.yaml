@@ -31,3 +31,31 @@ jobs:
       runs-on: ubuntu-latest
       go-version: "1.26.6"
     secrets: inherit # pragma: allowlist secret
+
+  # Trivy scans the image call-ko-build just pushed, via its image-ref output.
+  #
+  # Report-only for now (continue-on-error): the current image carries 8
+  # HIGH/CRITICAL findings, all from transitive dependencies. Making the gate
+  # blocking today would fail every build on day one. Tracked in #158, which
+  # flips this to false once the list is clear.
+  scan-pr:
+    if: github.event_name == 'pull_request'
+    needs: build-pr
+    uses: stuttgart-things/github-workflow-templates/.github/workflows/call-dagger-trivy-image-scan.yaml@main
+    with:
+      runs-on: ubuntu-latest
+      image-ref: ${{ needs.build-pr.outputs.image-ref }}
+      severity: HIGH,CRITICAL
+      artifact-name: trivy-image-report-pr-${{ github.event.number }}
+      continue-on-error: true
+
+  scan-main:
+    if: github.event_name != 'pull_request'
+    needs: build-main
+    uses: stuttgart-things/github-workflow-templates/.github/workflows/call-dagger-trivy-image-scan.yaml@main
+    with:
+      runs-on: ubuntu-latest
+      image-ref: ${{ needs.build-main.outputs.image-ref }}
+      severity: HIGH,CRITICAL
+      artifact-name: trivy-image-report-main
+      continue-on-error: true

@@ -423,7 +423,7 @@ Releases are fully automated via GitHub Actions and [semantic-release](https://s
 
 **Workflow chain on merge to `main`:**
 
-1. **Build, Push & Scan Container Image** — builds the container image with ko, pushes to `ghcr.io`, and scans with Trivy
+1. **Build, Push & Scan Container Image** — builds the container image with ko, pushes it, then scans it with Trivy (`HIGH,CRITICAL`). The scan is currently **report-only** — findings are uploaded as a `trivy-image-report-*` artifact but do not fail the build; see [#158](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/158)
 2. **Release** (triggered on successful image build) — runs semantic-release which:
    - Analyzes commit messages using [conventional commits](https://www.conventionalcommits.org/)
    - `fix:` → patch bump (e.g., 1.1.2 → 1.1.3)
