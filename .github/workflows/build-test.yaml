@@ -30,6 +30,23 @@ jobs:
           call: lint --src . --progress plain
           cloud-token: ${{ secrets.DAGGER_CLOUD_TOKEN }}
 
+      # Report-only for now: 13 reachable findings today, all from transitive
+      # deps pulled in by homerun-library. Flip to --fail-on-vuln once that
+      # list is clear (#158).
+      - name: Dagger govulncheck
+        uses: dagger/dagger-for-github@v8.4.1
+        with:
+          module: ./dagger
+          call: govulncheck --src . --progress plain export --path ./govulncheck-report.txt
+          cloud-token: ${{ secrets.DAGGER_CLOUD_TOKEN }}
+
+      - name: Upload govulncheck report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: govulncheck-report
+          path: govulncheck-report.txt
+
       - name: Dagger build-and-test
         uses: dagger/dagger-for-github@v8.4.1
         with:

@@ -27,6 +27,54 @@ func (m *Dagger) Lint(
 	})
 }
 
+// Govulncheck reports vulnerabilities from the Go vulnerability database that
+// are actually reachable from this module's code. It complements the Trivy
+// image scan: Trivy covers the base image and OS packages, this covers the Go
+// module graph, and each finds things the other misses.
+//
+// Report-only by default (failOnVuln=false) so it can be adopted without
+// breaking the build; set failOnVuln=true to turn it into a gate.
+func (m *Dagger) Govulncheck(
+	ctx context.Context,
+	src *dagger.Directory,
+	// +optional
+	// +default="1.26.6"
+	goVersion string,
+	// +optional
+	// +default="latest"
+	govulncheckVersion string,
+	// +optional
+	// +default=false
+	failOnVuln bool,
+) *dagger.File {
+	const reportPath = "/tmp/govulncheck-report.txt"
+
+	// govulncheck exits 3 when it finds something. Capture the report first and
+	// always echo it, so the run is readable whether or not it is a hard gate.
+	script := fmt.Sprintf(`
+set -u
+govulncheck ./... > %[1]s 2>&1
+code=$?
+cat %[1]s
+if [ "%[2]t" = "true" ] && [ "$code" -ne 0 ]; then
+  echo "govulncheck found vulnerabilities (exit $code)" >&2
+  exit "$code"
+fi
+exit 0
+`, reportPath, failOnVuln)
+
+	return dag.Container().
+		From("golang:"+goVersion).
+		// The golang image pins GOTOOLCHAIN=local; govulncheck and this module
+		// may both want a newer toolchain than the image ships.
+		WithEnvVariable("GOTOOLCHAIN", "auto").
+		WithDirectory("/src", src).
+		WithWorkdir("/src").
+		WithExec([]string{"go", "install", "golang.org/x/vuln/cmd/govulncheck@" + govulncheckVersion}).
+		WithExec([]string{"sh", "-c", script}).
+		File(reportPath)
+}
+
 // Build compiles the Go binary
 func (m *Dagger) Build(
 	ctx context.Context,
