@@ -1,3 +1,10 @@
+## [1.12.1](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.12.0...v1.12.1) (2026-08-18)
+
+
+### Bug Fixes
+
+* add /ready so readiness reflects backend reachability ([f3f69e8](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/f3f69e8638bcc006b968227aeadc4292d5f76994)), closes [#149](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/149)
+
 # [1.12.0](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.11.10...v1.12.0) (2026-08-18)
 
 
