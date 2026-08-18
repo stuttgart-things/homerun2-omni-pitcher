@@ -32,10 +32,19 @@ func NewGitHubPitchHandler(p pitcher.Pitcher, webhookSecret string, router *rout
 			return
 		}
 
+		// Cap before buffering: the signature check below runs on the whole
+		// body, so an unbounded ReadAll here would let an unauthenticated
+		// caller allocate arbitrary memory.
+		limitBody(w, r)
+
 		body, err := io.ReadAll(r.Body)
 		if err != nil {
 			metrics.RecordPitch(metrics.SourceGitHub, "", metrics.StatusError)
 			metrics.ObservePitchDuration(metrics.SourceGitHub, start)
+			if isBodyTooLarge(err) {
+				respondWithError(w, http.StatusRequestEntityTooLarge, "Request body too large")
+				return
+			}
 			respondWithError(w, http.StatusBadRequest, "Failed to read request body")
 			return
 		}

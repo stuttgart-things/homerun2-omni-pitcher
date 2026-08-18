@@ -137,6 +137,15 @@ func main() {
 	srv := &http.Server{
 		Addr:    ":" + port,
 		Handler: middleware.RequestLogging(mux),
+
+		// Without these the server will hold a connection open indefinitely
+		// while a client dribbles out a request (Slowloris). ReadHeaderTimeout
+		// is the one that actually closes that hole; the rest bound how long a
+		// single slow request can occupy a connection.
+		ReadHeaderTimeout: 10 * time.Second,
+		ReadTimeout:       30 * time.Second,
+		WriteTimeout:      60 * time.Second,
+		IdleTimeout:       120 * time.Second,
 	}
 
 	// Start server in goroutine

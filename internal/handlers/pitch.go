@@ -24,10 +24,16 @@ func NewPitchHandler(p pitcher.Pitcher, router *routing.Router) http.HandlerFunc
 			return
 		}
 
+		limitBody(w, r)
+
 		var msg homerun.Message
 		if err := json.NewDecoder(r.Body).Decode(&msg); err != nil {
 			metrics.RecordPitch(metrics.SourceRaw, "", metrics.StatusError)
 			metrics.ObservePitchDuration(metrics.SourceRaw, start)
+			if isBodyTooLarge(err) {
+				respondWithError(w, http.StatusRequestEntityTooLarge, "Request body too large")
+				return
+			}
 			respondWithError(w, http.StatusBadRequest, "Invalid JSON payload")
 			return
 		}

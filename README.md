@@ -412,6 +412,7 @@ Taskfile.yaml              # Task runner
 | `LOG_FORMAT` | Log format: `json` or `text` | `json` |
 | `LOG_LEVEL` | Log level: `debug`, `info`, `warn`, `error` | `info` |
 | `LOG_HEALTH_CHECKS` | Log `/health` probe requests (`true`/`false`) | `false` |
+| `MAX_BODY_BYTES` | Max accepted request body on `/pitch*` (bytes); oversized requests get `413` | `1048576` (1 MiB) |
 
 </details>
 
