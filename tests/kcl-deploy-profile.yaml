@@ -1,5 +1,5 @@
 ---
-config.image: ghcr.io/stuttgart-things/homerun2-omni-pitcher:latest
+config.image: ghcr.io/stuttgart-things/homerun2-omni-pitcher:main
 config.namespace: homerun2
 config.ingressEnabled: true
 config.ingressHost: homerun2-omni-pitcher.example.com

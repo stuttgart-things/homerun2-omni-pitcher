@@ -10,7 +10,10 @@ schema OmniPitcher:
     namespace: str = "homerun2"
 
     # Image
-    image: str = "ghcr.io/stuttgart-things/homerun2-omni-pitcher:latest"
+    # Placeholder for local renders only — release overrides this with the
+    # released version via kustomize-image-key. Points at :main rather than
+    # :latest because :latest is never published and returns 404.
+    image: str = "ghcr.io/stuttgart-things/homerun2-omni-pitcher:main"
     imagePullPolicy: str = "IfNotPresent"
 
     # Replicas and resources
