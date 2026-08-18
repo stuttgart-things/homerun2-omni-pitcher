@@ -1,3 +1,10 @@
+## [1.12.2](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.12.1...v1.12.2) (2026-08-18)
+
+
+### Bug Fixes
+
+* **release:** publish :latest on every release ([3f0c612](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/3f0c612a4a5addefeb1b144b85bb2d4cb66c8f7a)), closes [#162](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/162) [stuttgart-things/github-workflow-templates#146](https://github.com/stuttgart-things/github-workflow-templates/issues/146) [#165](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/165)
+
 ## [1.12.1](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.12.0...v1.12.1) (2026-08-18)
 
 
