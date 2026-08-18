@@ -54,8 +54,10 @@ func main() {
 		)
 	}
 
-	// Select pitcher backend
+	// Select pitcher backend. readyCheck stays nil for backends with no
+	// external dependency, which makes /ready trivially ready.
 	var p pitcher.Pitcher
+	var readyCheck handlers.ReadinessCheck
 	switch mode {
 	case "file":
 		filePath := homerun.GetEnv("PITCHER_FILE", "pitched.log")
@@ -83,6 +85,7 @@ func main() {
 		}
 
 		p = rp
+		readyCheck = rp.HealthCheck
 		slog.Info("pitcher mode: redis", "addr", redisConfig.Addr, "port", redisConfig.Port, "stream", redisConfig.Stream, "searchIndex", redisConfig.Index)
 	}
 
@@ -126,7 +129,12 @@ func main() {
 	metrics.SetBuildInfo(version, commit)
 
 	mux := http.NewServeMux()
+	// /health is liveness: "the process is alive". It must not fail on a Redis
+	// outage — restarting would not fix the backend, it would just crashloop.
+	// /ready is readiness: "should this pod get traffic", which a backend
+	// outage should absolutely change (#149).
 	mux.HandleFunc("/health", handlers.NewHealthHandler(buildInfo))
+	mux.HandleFunc("/ready", handlers.NewReadyHandler(readyCheck))
 	mux.Handle("/metrics", promhttp.Handler())
 	mux.HandleFunc("/pitch", authMiddleware(handlers.NewPitchHandler(p, router)))
 	mux.HandleFunc("/pitch/grafana", authMiddleware(handlers.NewGrafanaPitchHandler(p, router)))

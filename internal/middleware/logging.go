@@ -10,8 +10,8 @@ import (
 	"time"
 )
 
-// logHealthChecks controls whether /health requests are logged.
-// Set LOG_HEALTH_CHECKS=true to include them (default: false).
+// logHealthChecks controls whether kubelet probe requests (/health, /ready)
+// are logged. Set LOG_HEALTH_CHECKS=true to include them (default: false).
 var logHealthChecks = strings.EqualFold(os.Getenv("LOG_HEALTH_CHECKS"), "true")
 
 // statusRecorder wraps http.ResponseWriter to capture the status code.
@@ -39,7 +39,7 @@ func RequestLogging(next http.Handler) http.Handler {
 		rec := &statusRecorder{ResponseWriter: w, statusCode: http.StatusOK}
 		next.ServeHTTP(rec, r)
 
-		if r.URL.Path == "/health" && !logHealthChecks {
+		if isProbePath(r.URL.Path) && !logHealthChecks {
 			return
 		}
 
@@ -52,6 +52,12 @@ func RequestLogging(next http.Handler) http.Handler {
 			"client_ip", clientIP(r),
 		)
 	})
+}
+
+// isProbePath reports whether a path is a kubelet probe target. Probes run
+// every few seconds per pod, so logging them drowns real traffic.
+func isProbePath(p string) bool {
+	return p == "/health" || p == "/ready"
 }
 
 func clientIP(r *http.Request) string {
