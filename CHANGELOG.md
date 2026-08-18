@@ -1,3 +1,10 @@
+## [1.11.7](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.11.6...v1.11.7) (2026-08-18)
+
+
+### Bug Fixes
+
+* harden the HTTP edge ([1118d72](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/1118d72983445d834601359fadc0648cb16248ee)), closes [#146](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/146)
+
 ## [1.11.6](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.11.5...v1.11.6) (2026-08-18)
 
 
