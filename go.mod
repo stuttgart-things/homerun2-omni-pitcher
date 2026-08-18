@@ -7,7 +7,7 @@ require (
 	charm.land/lipgloss/v2 v2.0.6
 	github.com/MicahParks/keyfunc/v3 v3.8.1
 	github.com/golang-jwt/jwt/v5 v5.3.1
-	github.com/prometheus/client_golang v1.23.2
+	github.com/prometheus/client_golang v1.24.1
 	github.com/redis/go-redis/v9 v9.22.0
 	github.com/stuttgart-things/homerun-library/v3 v3.1.0
 	gopkg.in/yaml.v3 v3.0.1
@@ -135,7 +135,7 @@ require (
 	github.com/jedib0t/go-pretty/v6 v6.7.9 // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
-	github.com/klauspost/compress v1.18.2 // indirect
+	github.com/klauspost/compress v1.19.1 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.11 // indirect
 	github.com/klauspost/crc32 v1.3.0 // indirect
 	github.com/kylelemons/godebug v1.1.0 // indirect
@@ -168,8 +168,8 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/planetscale/vtprotobuf v0.6.1-0.20240319094008-0393e58bdf10 // indirect
 	github.com/prometheus/client_model v0.6.2 // indirect
-	github.com/prometheus/common v0.66.1 // indirect
-	github.com/prometheus/procfs v0.16.1 // indirect
+	github.com/prometheus/common v0.70.1 // indirect
+	github.com/prometheus/procfs v0.21.1 // indirect
 	github.com/pterm/pterm v0.12.83 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/rs/xid v1.6.0 // indirect
@@ -211,25 +211,24 @@ require (
 	go.opentelemetry.io/otel/trace v1.33.0 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/multierr v1.9.0 // indirect
-	go.yaml.in/yaml/v2 v2.4.2 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
-	golang.org/x/crypto v0.47.0 // indirect
+	golang.org/x/crypto v0.54.0 // indirect
 	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56 // indirect
-	golang.org/x/mod v0.32.0 // indirect
-	golang.org/x/net v0.49.0 // indirect
-	golang.org/x/oauth2 v0.30.0 // indirect
+	golang.org/x/mod v0.37.0 // indirect
+	golang.org/x/net v0.57.0 // indirect
+	golang.org/x/oauth2 v0.36.0 // indirect
 	golang.org/x/sync v0.22.0 // indirect
 	golang.org/x/sys v0.47.0 // indirect
-	golang.org/x/term v0.40.0 // indirect
-	golang.org/x/text v0.34.0 // indirect
+	golang.org/x/term v0.45.0 // indirect
+	golang.org/x/text v0.40.0 // indirect
 	golang.org/x/time v0.15.0 // indirect
-	golang.org/x/tools v0.41.0 // indirect
+	golang.org/x/tools v0.47.0 // indirect
 	google.golang.org/api v0.214.0 // indirect
 	google.golang.org/genproto v0.0.0-20241223144023-3abc09e42ca8 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20241223144023-3abc09e42ca8 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20241223144023-3abc09e42ca8 // indirect
 	google.golang.org/grpc v1.69.2 // indirect
-	google.golang.org/protobuf v1.36.8 // indirect
+	google.golang.org/protobuf v1.36.11 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
