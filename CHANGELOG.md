@@ -1,3 +1,10 @@
+## [1.11.8](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.11.7...v1.11.8) (2026-08-18)
+
+
+### Bug Fixes
+
+* **ci:** actually scan images with Trivy ([5f5708a](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/5f5708ade883d127acc89d3bc8905f1ba255ea18)), closes [#158](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/158) [#157](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/157) [#147](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/147)
+
 ## [1.11.7](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.11.6...v1.11.7) (2026-08-18)
 
 
