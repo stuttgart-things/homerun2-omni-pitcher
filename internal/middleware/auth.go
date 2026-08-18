@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"crypto/subtle"
 	"fmt"
 	"net/http"
 	"strings"
@@ -32,7 +33,9 @@ func TokenAuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		if token != expectedToken {
+		// Constant-time compare: a byte-wise != leaks how much of the secret
+		// matched via timing. Mirrors hmac.Equal on the GitHub webhook path.
+		if subtle.ConstantTimeCompare([]byte(token), []byte(expectedToken)) != 1 {
 			respondWithAuthError(w, http.StatusUnauthorized, "Invalid token")
 			return
 		}

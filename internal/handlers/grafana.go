@@ -27,10 +27,16 @@ func NewGrafanaPitchHandler(p pitcher.Pitcher, router *routing.Router) http.Hand
 			return
 		}
 
+		limitBody(w, r)
+
 		var payload models.GrafanaWebhookPayload
 		if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
 			metrics.RecordPitch(metrics.SourceGrafana, "", metrics.StatusError)
 			metrics.ObservePitchDuration(metrics.SourceGrafana, start)
+			if isBodyTooLarge(err) {
+				respondWithError(w, http.StatusRequestEntityTooLarge, "Request body too large")
+				return
+			}
 			respondWithError(w, http.StatusBadRequest, "Invalid Grafana webhook payload")
 			return
 		}
