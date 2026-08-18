@@ -19,6 +19,7 @@ jobs:
     uses: stuttgart-things/github-workflow-templates/.github/workflows/call-ko-build.yaml@main
     with:
       runs-on: ubuntu-latest
+      go-version: "1.26.6"
       registry: ghcr.io
       tags: pr-${{ github.event.number }}-${{ github.event.pull_request.head.sha }},pr-${{ github.event.number }}
     secrets: inherit # pragma: allowlist secret
@@ -28,4 +29,5 @@ jobs:
     uses: stuttgart-things/github-workflow-templates/.github/workflows/call-ko-build.yaml@main
     with:
       runs-on: ubuntu-latest
+      go-version: "1.26.6"
     secrets: inherit # pragma: allowlist secret
