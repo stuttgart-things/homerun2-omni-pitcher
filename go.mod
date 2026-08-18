@@ -1,6 +1,6 @@
 module github.com/stuttgart-things/homerun2-omni-pitcher
 
-go 1.25.0
+go 1.26.6
 
 require (
 	charm.land/bubbletea/v2 v2.0.8
