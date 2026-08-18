@@ -1,3 +1,10 @@
+## [1.11.10](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.11.9...v1.11.10) (2026-08-18)
+
+
+### Bug Fixes
+
+* **release:** pin a real image tag in the published kustomize base ([5496ad7](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/5496ad7c8cde3c0f80bf35e8d511e8ed468e7d0c)), closes [#160](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/160)
+
 ## [1.11.9](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.11.8...v1.11.9) (2026-08-18)
 
 
