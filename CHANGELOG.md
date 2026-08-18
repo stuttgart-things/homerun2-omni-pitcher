@@ -1,3 +1,10 @@
+## [1.11.9](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.11.8...v1.11.9) (2026-08-18)
+
+
+### Bug Fixes
+
+* **ci:** publish main builds to ghcr.io as :main ([969f07f](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/969f07f0fb7f1a961885bfb60eee11e547148204)), closes [#147](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/147) [#157](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/157)
+
 ## [1.11.8](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.11.7...v1.11.8) (2026-08-18)
 
 
