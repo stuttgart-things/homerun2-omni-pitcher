@@ -1,3 +1,10 @@
+## [1.11.6](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.11.5...v1.11.6) (2026-08-18)
+
+
+### Bug Fixes
+
+* **deps:** update module github.com/prometheus/client_golang to v1.24.1 ([76b0154](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/76b0154245bb4ef71a8d7b4b42bc1740b9419b59))
+
 ## [1.11.5](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.11.4...v1.11.5) (2026-08-18)
 
 
