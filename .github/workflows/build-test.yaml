@@ -47,6 +47,13 @@ jobs:
           name: govulncheck-report
           path: govulncheck-report.txt
 
+      - name: Dagger go test
+        uses: dagger/dagger-for-github@v8.4.1
+        with:
+          module: ./dagger
+          call: test --src . --progress plain
+          cloud-token: ${{ secrets.DAGGER_CLOUD_TOKEN }}
+
       - name: Dagger build-and-test
         uses: dagger/dagger-for-github@v8.4.1
         with:
