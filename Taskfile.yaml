@@ -320,6 +320,15 @@ tasks:
 
   # === Smoke Test ===
 
+  test:
+    desc: Run the Go test suite with Redis via Dagger
+    cmds:
+      - |
+        dagger call -m {{ .DAGGER_MODULE_DIR }} \
+        test \
+        --src . \
+        --progress plain
+
   smoke-test:
     desc: Run smoke test against a deployed pitcher instance
     vars:

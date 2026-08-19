@@ -75,6 +75,40 @@ exit 0
 		File(reportPath)
 }
 
+// Test runs the Go test suite with a Redis service bound, so tests that talk
+// to Redis work the same way they do in the smoke test.
+//
+// It returns the test output and fails the call when the suite fails - the
+// point being that CI can go red. See issue #168.
+func (m *Dagger) Test(
+	ctx context.Context,
+	src *dagger.Directory,
+	// +optional
+	// +default="1.26.6"
+	goVersion string,
+	// +optional
+	// +default="./..."
+	testPath string,
+) (string, error) {
+	redisService := dag.Homerun().RedisService(dagger.HomerunRedisServiceOpts{
+		Version:  "7.2.0-v18",
+		Password: "",
+	})
+
+	return dag.Container().
+		From("golang:"+goVersion).
+		WithDirectory("/src", src).
+		WithWorkdir("/src").
+		WithMountedCache("/go/pkg/mod", dag.CacheVolume("gomod")).
+		WithMountedCache("/root/.cache/go-build", dag.CacheVolume("gobuild")).
+		WithServiceBinding("redis", redisService).
+		WithEnvVariable("REDIS_ADDR", "redis").
+		WithEnvVariable("REDIS_PORT", "6379").
+		WithEnvVariable("REDIS_STREAM", "messages").
+		WithExec([]string{"go", "test", "-v", "-cover", testPath}).
+		Stdout(ctx)
+}
+
 // Build compiles the Go binary
 func (m *Dagger) Build(
 	ctx context.Context,
@@ -160,9 +194,6 @@ func (m *Dagger) BuildAndTestBinary(
 	// +optional
 	// +default="."
 	packageName string,
-	// +optional
-	// +default="./..."
-	testPath string,
 	// +optional
 	// +default="8080"
 	port int,
