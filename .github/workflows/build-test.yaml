@@ -30,14 +30,17 @@ jobs:
           call: lint --src . --progress plain
           cloud-token: ${{ secrets.DAGGER_CLOUD_TOKEN }}
 
-      # Report-only for now: 13 reachable findings today, all from transitive
-      # deps pulled in by homerun-library. Flip to --fail-on-vuln once that
-      # list is clear (#158).
+      # Blocking as of #167: the homerun-library bump took the reachable count
+      # from 13 to 0, which is what the report-only period (#158) was waiting
+      # for. The report is still exported and uploaded, so a red run stays
+      # diagnosable.
       - name: Dagger govulncheck
         uses: dagger/dagger-for-github@v8.4.1
         with:
           module: ./dagger
-          call: govulncheck --src . --progress plain export --path ./govulncheck-report.txt
+          call: >-
+            govulncheck --src . --fail-on-vuln=true --progress plain
+            export --path ./govulncheck-report.txt
           cloud-token: ${{ secrets.DAGGER_CLOUD_TOKEN }}
 
       - name: Upload govulncheck report
