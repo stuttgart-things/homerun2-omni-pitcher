@@ -19,7 +19,7 @@ import (
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/routing"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	homerun "github.com/stuttgart-things/homerun-library/v3"
+	homerun "github.com/stuttgart-things/homerun-library/v4"
 )
 
 // Build-time variables set via ldflags

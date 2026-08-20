@@ -17,7 +17,7 @@ import (
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/pitcher"
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/routing"
 
-	homerun "github.com/stuttgart-things/homerun-library/v3"
+	homerun "github.com/stuttgart-things/homerun-library/v4"
 )
 
 // NewGitHubPitchHandler creates a handler that accepts GitHub webhook payloads
@@ -172,7 +172,7 @@ func mapPushEvent(p models.GitHubWebhookPayload) homerun.Message {
 		Timestamp: time.Now().Format(time.RFC3339),
 		System:    p.Repository.FullName,
 		Tags:      joinTags(p.Repository.Topics),
-		Url:       p.Repository.HTMLURL + "/compare/" + shortSHA(p.Before) + "..." + shortSHA(p.After),
+		URL:       p.Repository.HTMLURL + "/compare/" + shortSHA(p.Before) + "..." + shortSHA(p.After),
 	}
 }
 
@@ -201,7 +201,7 @@ func mapPullRequestEvent(p models.GitHubWebhookPayload) homerun.Message {
 		Timestamp:       time.Now().Format(time.RFC3339),
 		System:          p.Repository.FullName,
 		Tags:            joinTags(p.Repository.Topics),
-		Url:             pr.HTMLURL,
+		URL:             pr.HTMLURL,
 		AssigneeName:    p.Sender.Login,
 		AssigneeAddress: p.Sender.HTMLURL,
 	}
@@ -227,7 +227,7 @@ func mapIssueEvent(p models.GitHubWebhookPayload) homerun.Message {
 		Timestamp: time.Now().Format(time.RFC3339),
 		System:    p.Repository.FullName,
 		Tags:      joinTags(p.Repository.Topics),
-		Url:       issue.HTMLURL,
+		URL:       issue.HTMLURL,
 	}
 }
 
@@ -256,7 +256,7 @@ func mapReleaseEvent(p models.GitHubWebhookPayload) homerun.Message {
 		Timestamp: time.Now().Format(time.RFC3339),
 		System:    p.Repository.FullName,
 		Tags:      joinTags(p.Repository.Topics),
-		Url:       rel.HTMLURL,
+		URL:       rel.HTMLURL,
 		Artifacts: rel.TagName,
 	}
 }
@@ -288,7 +288,7 @@ func mapWorkflowRunEvent(p models.GitHubWebhookPayload) homerun.Message {
 		Timestamp: time.Now().Format(time.RFC3339),
 		System:    p.Repository.FullName,
 		Tags:      joinTags(p.Repository.Topics),
-		Url:       wf.HTMLURL,
+		URL:       wf.HTMLURL,
 	}
 }
 
@@ -308,7 +308,7 @@ func mapGenericEvent(eventType string, p models.GitHubWebhookPayload) homerun.Me
 		Timestamp: time.Now().Format(time.RFC3339),
 		System:    p.Repository.FullName,
 		Tags:      joinTags(p.Repository.Topics),
-		Url:       p.Repository.HTMLURL,
+		URL:       p.Repository.HTMLURL,
 	}
 }
 

@@ -3,7 +3,7 @@ package routing
 import (
 	"testing"
 
-	homerun "github.com/stuttgart-things/homerun-library/v3"
+	homerun "github.com/stuttgart-things/homerun-library/v4"
 )
 
 func TestNilRouterReturnsEmpty(t *testing.T) {

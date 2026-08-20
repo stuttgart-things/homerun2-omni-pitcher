@@ -11,7 +11,7 @@ import (
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/models"
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/pitcher"
 
-	homerun "github.com/stuttgart-things/homerun-library/v3"
+	homerun "github.com/stuttgart-things/homerun-library/v4"
 )
 
 // pitchedMessage records a message that was pitched (for test assertions).
@@ -209,8 +209,8 @@ func TestGrafanaAlertToMessage(t *testing.T) {
 		if msg.System != "prod-alerts" {
 			t.Errorf("expected system 'prod-alerts', got '%s'", msg.System)
 		}
-		if msg.Url != "http://grafana.local/d/abc" {
-			t.Errorf("expected url 'http://grafana.local/d/abc', got '%s'", msg.Url)
+		if msg.URL != "http://grafana.local/d/abc" {
+			t.Errorf("expected url 'http://grafana.local/d/abc', got '%s'", msg.URL)
 		}
 	})
 

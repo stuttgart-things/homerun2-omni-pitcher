@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
-	homerun "github.com/stuttgart-things/homerun-library/v3"
+	homerun "github.com/stuttgart-things/homerun-library/v4"
 )
 
 // DefaultMaxBodyBytes caps how much of a request body the pitch endpoints will

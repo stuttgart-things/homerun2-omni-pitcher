@@ -13,7 +13,7 @@ import (
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/pitcher"
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/routing"
 
-	homerun "github.com/stuttgart-things/homerun-library/v3"
+	homerun "github.com/stuttgart-things/homerun-library/v4"
 )
 
 // NewGrafanaPitchHandler creates a handler that accepts Grafana webhook payloads
@@ -158,7 +158,7 @@ func grafanaAlertToMessage(alert models.GrafanaAlert, payload models.GrafanaWebh
 		Timestamp: timestamp,
 		System:    payload.Receiver,
 		Tags:      strings.Join(tags, ","),
-		Url:       url,
+		URL:       url,
 	}
 }
 
