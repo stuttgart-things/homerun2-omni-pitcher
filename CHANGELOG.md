@@ -1,3 +1,34 @@
+# [2.0.0](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.12.3...v2.0.0) (2026-08-20)
+
+
+* chore(deps)!: migrate to homerun-library v4 and drop the RediSearch dual-write ([#177](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/177)) ([9714480](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/97144803db0b898f5a998d78a0ed932a1f08f8c2)), closes [homerun-library#103](https://github.com/homerun-library/issues/103)
+
+
+### BREAKING CHANGES
+
+* homerun-library moved to the /v4 module path and renamed
+Message.Url to Message.URL.
+
+- Import path github.com/stuttgart-things/homerun-library/v3 -> /v4.
+- Message.Url -> Message.URL (6 sites). The JSON tag stays "url", so nothing on
+  the wire, in Redis JSON or in the index changes.
+
+Drop the RediSearch dual-write
+
+Pitch called homerun.StoreInRediSearch on every message. That function writes a
+hash; EnsureIndex creates the index ON JSON, and an ON JSON index does not index
+hashes. So the document was stored but never indexed: FT.SEARCH never found it,
+and since retention prunes by search result, nothing ever deleted it either -
+the key carries no TTL. The library returned nil regardless.
+
+Reproduced against redis-stack-server:7.2.0-v18: after one Pitch, FT.SEARCH
+returned exactly one document - the Redis JSON one written by
+EnqueueMessageInRedisStreams, carrying the correct event timestamp - while the
+hash sat beside it with ttl=-1, invisible.
+
+The dual-write was therefore redundant where it worked and harmful where it did
+not, so it is removed. homerun-library v4 refuses the write rather than
+
 ## [1.12.3](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.12.2...v1.12.3) (2026-08-20)
 
 
