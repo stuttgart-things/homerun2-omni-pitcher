@@ -1,3 +1,10 @@
+## [1.12.3](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.12.2...v1.12.3) (2026-08-20)
+
+
+### Bug Fixes
+
+* **deps:** update module charm.land/bubbletea/v2 to v2.0.9 ([#174](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/174)) ([41a9b77](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/41a9b7760242abdbc70f828edb179bbb60f9b7fe))
+
 ## [1.12.2](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.12.1...v1.12.2) (2026-08-18)
 
 
