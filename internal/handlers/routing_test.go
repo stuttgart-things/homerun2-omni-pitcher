@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/routing"
-	homerun "github.com/stuttgart-things/homerun-library/v3"
+	homerun "github.com/stuttgart-things/homerun-library/v4"
 )
 
 // capturingPitcher records the streamOverride passed to Pitch().

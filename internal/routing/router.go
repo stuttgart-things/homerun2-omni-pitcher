@@ -3,7 +3,7 @@ package routing
 import (
 	"strings"
 
-	homerun "github.com/stuttgart-things/homerun-library/v3"
+	homerun "github.com/stuttgart-things/homerun-library/v4"
 )
 
 // Router resolves an effective Redis stream for a given endpoint + message.

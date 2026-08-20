@@ -30,7 +30,7 @@ func (p *RedisPitcher) EnsureIndex(ctx context.Context) error {
 		return nil
 	}
 
-	if !strings.Contains(err.Error(), "no such index") {
+	if !isUnknownIndexError(err) {
 		return fmt.Errorf("failed to check redisearch index: %w", err)
 	}
 
@@ -57,4 +57,17 @@ func (p *RedisPitcher) EnsureIndex(ctx context.Context) error {
 
 	slog.Info("redisearch index created", "index", p.Config.Index)
 	return nil
+}
+
+// isUnknownIndexError reports whether err is RediSearch saying the index does
+// not exist yet, which is the one case EnsureIndex must treat as "create it".
+//
+// The wording differs by version: RediSearch 2.x (redis-stack 7.2, what we run)
+// answers "Unknown index name", older builds "no such index". Matching only the
+// latter meant EnsureIndex reported a hard error instead of creating the index -
+// and since main.go only logs a warning, the service came up with no search
+// index at all.
+func isUnknownIndexError(err error) bool {
+	msg := strings.ToLower(err.Error())
+	return strings.Contains(msg, "unknown index name") || strings.Contains(msg, "no such index")
 }

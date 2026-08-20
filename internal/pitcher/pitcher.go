@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/redis/go-redis/v9"
-	homerun "github.com/stuttgart-things/homerun-library/v3"
+	homerun "github.com/stuttgart-things/homerun-library/v4"
 )
 
 // Pitcher defines the interface for message delivery backends.
@@ -46,14 +46,14 @@ func (p *RedisPitcher) Pitch(msg homerun.Message, streamOverride ...string) (str
 		return "", "", fmt.Errorf("failed to enqueue message to Redis stream: %w", err)
 	}
 
-	// Best-effort dual-write to RediSearch index (non-blocking for the pitch path)
-	if p.Config.Index != "" {
-		if err := homerun.StoreInRediSearch(msg, p.Config); err != nil {
-			slog.Warn("failed to index message in RediSearch (best-effort)", "error", err, "index", p.Config.Index)
-		} else {
-			slog.Debug("message indexed in RediSearch", "index", p.Config.Index)
-		}
-	}
+	// No dual-write to RediSearch: EnsureIndex creates the index ON JSON, so it
+	// indexes the Redis JSON document EnqueueMessageInRedisStreams just wrote -
+	// with the message's own timestamp. homerun.StoreInRediSearch maintained a
+	// second, hash-based copy in a separate key, which an ON JSON index does not
+	// index at all: FT.SEARCH never found it, and since retention prunes by
+	// search result, nothing ever deleted it either (the key carries no TTL).
+	// The library returned nil regardless; as of v4 it refuses. See
+	// homerun-library#103.
 
 	return objectID, streamID, nil
 }
