@@ -79,7 +79,12 @@ deployment = {
                                 name: "REDIS_STREAM"
                                 value: config.redisStream
                             }
-                        ]
+                        ] + ([
+                            {
+                                name: "ROUTES_CONFIG"
+                                value: "{}/routes.yaml".format(config.routesPath)
+                            }
+                        ] if config.routesConfig else [])
                         envFrom: [
                             {
                                 configMapRef: {
@@ -130,7 +135,13 @@ deployment = {
                                 name: "tmp"
                                 mountPath: "/tmp"
                             }
-                        ]
+                        ] + ([
+                            {
+                                name: "routes"
+                                mountPath: config.routesPath
+                                readOnly: True
+                            }
+                        ] if config.routesConfig else [])
                     }
                 ]
                 securityContext: {
@@ -147,7 +158,14 @@ deployment = {
                         name: "tmp"
                         emptyDir: {}
                     }
-                ]
+                ] + ([
+                    {
+                        name: "routes"
+                        configMap: {
+                            name: "{}-routes".format(config.name)
+                        }
+                    }
+                ] if config.routesConfig else [])
                 affinity: {
                     podAntiAffinity: {
                         preferredDuringSchedulingIgnoredDuringExecution: [

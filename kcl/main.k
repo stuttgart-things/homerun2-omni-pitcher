@@ -5,6 +5,7 @@ Imports all resources and exports manifests
 
 import serviceaccount
 import configmap
+import routes_configmap
 import secret
 import deploy
 import service
@@ -23,6 +24,7 @@ manifests = [
     m for m in [
         serviceaccount.serviceAccount
         configmap.configMap
+        routes_configmap.routesConfigMap
         secret.secretToken
         secret.secretRedis
         deploy.deployment
