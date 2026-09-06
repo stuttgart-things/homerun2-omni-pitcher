@@ -52,6 +52,27 @@ schema OmniPitcher:
     authToken: str = ""
     redisPassword: str = ""
 
+    # Config-driven stream routing (#105). The YAML content of the routing
+    # file; empty leaves routing off, which is the legacy single-stream path
+    # where REDIS_STREAM takes every message.
+    #
+    # Set, this renders a ConfigMap, mounts it, and points ROUTES_CONFIG at it
+    # — without which the feature is in the binary but unreachable from a
+    # kustomize deployment.
+    #
+    #     routesConfig: """
+    #     streams: [messages, tabletennis]
+    #     default_stream: messages
+    #     routes:
+    #       - match: { system: tabletennis }
+    #         stream: tabletennis
+    #     """
+    routesConfig: str = ""
+
+    # Where the routing file is mounted. ROUTES_CONFIG is set to
+    # <routesPath>/routes.yaml.
+    routesPath: str = "/config/routing"
+
     # Extra environment variables
     extraEnvVars: {str:str} = {}
 

@@ -23,6 +23,8 @@ _redisStream = option("config.redisStream")
 _authToken = option("config.authToken")
 _redisPassword = option("config.redisPassword")
 _extraEnvVars = option("config.extraEnvVars") or {}
+_routesConfig = option("config.routesConfig")
+_routesPath = option("config.routesPath")
 
 # Config instance with command-line overrides
 config: schema.OmniPitcher = schema.OmniPitcher {
@@ -62,6 +64,10 @@ config: schema.OmniPitcher = schema.OmniPitcher {
         redisPassword = _redisPassword
     if _extraEnvVars:
         extraEnvVars = _extraEnvVars
+    if _routesConfig:
+        routesConfig = _routesConfig
+    if _routesPath:
+        routesPath = _routesPath
 }
 
 # Common labels applied to all resources
