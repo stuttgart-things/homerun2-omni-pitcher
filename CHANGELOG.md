@@ -1,3 +1,10 @@
+# [2.1.0](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v2.0.0...v2.1.0) (2026-09-06)
+
+
+### Features
+
+* make stream routing reachable from a kustomize deployment ([#179](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/179)) ([9932942](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/99329429500edf611093bc192a79501ea8deefd1)), closes [#105](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/105)
+
 # [2.0.0](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v1.12.3...v2.0.0) (2026-08-20)
 
 
