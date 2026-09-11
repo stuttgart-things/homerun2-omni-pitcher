@@ -403,6 +403,7 @@ Taskfile.yaml              # Task runner
 | `REDIS_PASSWORD` | Redis password | (empty) |
 | `REDIS_STREAM` | Redis stream name | `messages` |
 | `REDIS_SEARCH_INDEX` | RediSearch index name (enables dual-write) | (empty = disabled) |
+| `REDIS_STARTUP_TIMEOUT` | How long startup retries Redis before exiting (Go duration) | `120s` |
 | `GITHUB_WEBHOOK_SECRET` | HMAC secret for GitHub webhook signature validation | (empty = skip) |
 | `AUTH_MODE` | Auth mode: `token` or `jwt` | `token` |
 | `AUTH_TOKEN` | Bearer token (token mode) | (required) |

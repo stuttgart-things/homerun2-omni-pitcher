@@ -173,6 +173,7 @@ Returns `200 OK` when the service is running.
 | `REDIS_STREAM`  | `messages`                                   | Redis stream name (used when `ROUTES_CONFIG` is unset) |
 | `ROUTES_CONFIG` | (empty)                                      | Path to YAML stream-routing config; see [Stream routing](../README.md#stream-routing) in the README |
 | `REDIS_SEARCH_INDEX` | (empty)                                 | RediSearch index name (enables dual-write) |
+| `REDIS_STARTUP_TIMEOUT` | `120s`                               | How long startup retries Redis before exiting (Go duration) |
 | `GITHUB_WEBHOOK_SECRET` | (empty)                              | HMAC secret for GitHub webhook validation |
 | `AUTH_TOKEN`    | (required)                                   | Bearer token for auth    |
 | `REDIS_PASSWORD`| (optional)                                   | Redis password           |
