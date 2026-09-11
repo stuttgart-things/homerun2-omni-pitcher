@@ -77,7 +77,19 @@ func main() {
 			slog.Error("invalid configuration", "error", err)
 			os.Exit(1)
 		}
-		if err := homerun.WaitForRedis(redisConfig, startupTimeout); err != nil {
+		// A SIGINT/SIGTERM during the wait ends it at once, with exit code 0
+		// (#186). WaitForRedis alone runs on context.Background() and sat out
+		// the whole timeout. Unregistered right after the wait, so the shutdown
+		// handling further down is unchanged.
+		waitCtx, stopWait := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+		err = homerun.WaitForRedisContext(waitCtx, redisConfig, startupTimeout)
+		interrupted := waitCtx.Err() != nil
+		stopWait()
+		if interrupted {
+			slog.Info("shutdown requested while waiting for redis")
+			os.Exit(0)
+		}
+		if err != nil {
 			slog.Error("redis health check failed", "error", err, "addr", redisConfig.Addr, "port", redisConfig.Port, "startup_timeout", startupTimeout.String())
 			os.Exit(1)
 		}
