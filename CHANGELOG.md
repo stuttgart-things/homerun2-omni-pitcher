@@ -1,3 +1,10 @@
+## [2.1.1](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v2.1.0...v2.1.1) (2026-09-11)
+
+
+### Bug Fixes
+
+* make the Redis startup budget configurable, default 120s ([f92eee1](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/f92eee17ad177d6bc146aa172be823009ea06dfa)), closes [#180](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/180)
+
 # [2.1.0](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v2.0.0...v2.1.0) (2026-09-06)
 
 
