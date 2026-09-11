@@ -1,3 +1,10 @@
+## [2.1.3](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v2.1.2...v2.1.3) (2026-09-11)
+
+
+### Bug Fixes
+
+* stop waiting for Redis when a shutdown signal arrives ([7e406e9](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/7e406e9071ad5e00ff994b16ee2d2f8b346c124e)), closes [#184](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/184) [#186](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/186)
+
 ## [2.1.2](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v2.1.1...v2.1.2) (2026-09-11)
 
 
