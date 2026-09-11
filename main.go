@@ -72,18 +72,15 @@ func main() {
 		// per-PR namespace, see #121; a redis-stack installed alongside, #180)
 		// without masking genuine misconfig — the process still fails once
 		// REDIS_STARTUP_TIMEOUT expires.
-		startupTimeout, err := config.LoadRedisStartupTimeout()
+		startupTimeout, err := homerun.LoadRedisStartupTimeout()
 		if err != nil {
 			slog.Error("invalid configuration", "error", err)
 			os.Exit(1)
 		}
-		ctx, cancel := context.WithTimeout(context.Background(), startupTimeout)
-		if err := pitcher.WaitForReady(ctx, rp.HealthCheck, 5*time.Second); err != nil {
+		if err := homerun.WaitForRedis(redisConfig, startupTimeout); err != nil {
 			slog.Error("redis health check failed", "error", err, "addr", redisConfig.Addr, "port", redisConfig.Port, "startup_timeout", startupTimeout.String())
-			cancel()
 			os.Exit(1)
 		}
-		cancel()
 
 		// Ensure RediSearch index exists before accepting requests
 		if err := rp.EnsureIndex(context.Background()); err != nil {
