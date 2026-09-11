@@ -1,3 +1,10 @@
+## [2.1.2](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v2.1.1...v2.1.2) (2026-09-11)
+
+
+### Bug Fixes
+
+* **kcl:** add a startupProbe so liveness does not kill the pod while it waits for Redis ([e11607d](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/e11607d7c3afec8c8303205705f26821aab79cc9)), closes [#182](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/182)
+
 ## [2.1.1](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v2.1.0...v2.1.1) (2026-09-11)
 
 
