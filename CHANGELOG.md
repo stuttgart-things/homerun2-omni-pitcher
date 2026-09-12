@@ -1,3 +1,10 @@
+## [2.1.4](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v2.1.3...v2.1.4) (2026-09-12)
+
+
+### Bug Fixes
+
+* stamp the build date, and clean pre-commit on main ([#190](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/190)) ([45e2a37](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/45e2a37c4d09fe3c2f9e8add3b478a7b29de9f28))
+
 ## [2.1.3](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v2.1.2...v2.1.3) (2026-09-11)
 
 
