@@ -147,7 +147,7 @@ func TestPitchHandlerAcceptsBodyUnderLimit(t *testing.T) {
 func TestGitHubHandlerValidSignatureUnderLimit(t *testing.T) {
 	withMaxBodyBytes(t, 4096)
 
-	const secret = "s3cret"
+	const secret = "s3cret" // pragma: allowlist secret
 	body := []byte(`{"action":"opened"}`)
 
 	mac := hmac.New(sha256.New, []byte(secret))

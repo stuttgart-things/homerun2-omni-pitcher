@@ -70,11 +70,11 @@ func TestGrafanaPitchHandler(t *testing.T) {
 				Status:   "firing",
 				Alerts: []models.GrafanaAlert{
 					{
-						Status:      "firing",
-						Labels:      map[string]string{"alertname": "HighCPU", "severity": "critical", "instance": "node-1"},
-						Annotations: map[string]string{"summary": "CPU usage is above 90%"},
-						StartsAt:    "2026-03-11T10:00:00Z",
-						Fingerprint: "abc123",
+						Status:       "firing",
+						Labels:       map[string]string{"alertname": "HighCPU", "severity": "critical", "instance": "node-1"},
+						Annotations:  map[string]string{"summary": "CPU usage is above 90%"},
+						StartsAt:     "2026-03-11T10:00:00Z",
+						Fingerprint:  "abc123",
 						GeneratorURL: "http://grafana.local/alerting/abc123",
 					},
 				},
