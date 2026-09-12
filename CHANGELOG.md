@@ -1,3 +1,10 @@
+# [2.2.0](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v2.1.4...v2.2.0) (2026-09-12)
+
+
+### Features
+
+* index the event time as NUMERIC timestamp_unix ([#192](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/192)) ([444b64d](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/444b64db384eb4f7cdd257adec1ebf15a68f4b11)), closes [#191](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/191)
+
 ## [2.1.4](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v2.1.3...v2.1.4) (2026-09-12)
 
 
