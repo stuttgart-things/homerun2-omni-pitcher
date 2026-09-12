@@ -15,16 +15,16 @@ import (
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/metrics"
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/models"
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/pitcher"
-	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/routing"
 
 	homerun "github.com/stuttgart-things/homerun-library/v4"
+	"github.com/stuttgart-things/homerun-library/v4/routing"
 )
 
 // NewGitHubPitchHandler creates a handler that accepts GitHub webhook payloads
 // and converts them into homerun.Message for pitching.
 // If webhookSecret is non-empty, the handler validates X-Hub-Signature-256.
 // If router is non-nil, the resolved stream is passed as a per-request override.
-func NewGitHubPitchHandler(p pitcher.Pitcher, webhookSecret string, router *routing.Router) http.HandlerFunc {
+func NewGitHubPitchHandler(p pitcher.Pitcher, webhookSecret string, routes *routing.StreamRoutes) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
 		if r.Method != http.MethodPost {
@@ -88,7 +88,7 @@ func NewGitHubPitchHandler(p pitcher.Pitcher, webhookSecret string, router *rout
 
 		msg := githubEventToMessage(eventType, payload)
 
-		stream := router.Resolve(r.URL.Path, msg)
+		stream, _ := routes.Resolve(r.URL.Path, msg)
 		objectID, streamID, err := p.Pitch(msg, stream)
 		if err != nil {
 			metrics.RecordPitch(metrics.SourceGitHub, msg.Severity, metrics.StatusError)

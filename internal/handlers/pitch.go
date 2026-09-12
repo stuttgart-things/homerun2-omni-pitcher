@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"log/slog"
 	"net/http"
 	"time"
@@ -9,14 +10,14 @@ import (
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/metrics"
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/models"
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/pitcher"
-	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/routing"
 
 	homerun "github.com/stuttgart-things/homerun-library/v4"
+	"github.com/stuttgart-things/homerun-library/v4/routing"
 )
 
 // NewPitchHandler creates a pitch handler with the given Pitcher backend.
-// If router is non-nil, the resolved stream is passed as a per-request override.
-func NewPitchHandler(p pitcher.Pitcher, router *routing.Router) http.HandlerFunc {
+// If routes is non-nil, the resolved stream is passed as a per-request override.
+func NewPitchHandler(p pitcher.Pitcher, routes *routing.StreamRoutes) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
 		if r.Method != http.MethodPost {
@@ -38,35 +39,18 @@ func NewPitchHandler(p pitcher.Pitcher, router *routing.Router) http.HandlerFunc
 			return
 		}
 
-		// Validate required fields
-		if msg.Title == "" {
+		// Required fields and defaults for the optional ones, shared with
+		// homerun2-config-viewer's dry run through homerun-library routing.
+		pitch, err := routing.PreparePitch(msg, time.Now())
+		if err != nil {
 			metrics.RecordPitch(metrics.SourceRaw, msg.Severity, metrics.StatusError)
 			metrics.ObservePitchDuration(metrics.SourceRaw, start)
-			respondWithError(w, http.StatusBadRequest, "Title is required")
+			respondWithError(w, http.StatusBadRequest, pitchErrorMessage(err))
 			return
 		}
-		if msg.Message == "" {
-			metrics.RecordPitch(metrics.SourceRaw, msg.Severity, metrics.StatusError)
-			metrics.ObservePitchDuration(metrics.SourceRaw, start)
-			respondWithError(w, http.StatusBadRequest, "Message is required")
-			return
-		}
+		msg = pitch.Message
 
-		// Set defaults for optional fields
-		if msg.Severity == "" {
-			msg.Severity = "info"
-		}
-		if msg.Author == "" {
-			msg.Author = "unknown"
-		}
-		if msg.Timestamp == "" {
-			msg.Timestamp = time.Now().Format(time.RFC3339)
-		}
-		if msg.System == "" {
-			msg.System = "homerun2-omni-pitcher"
-		}
-
-		stream := router.Resolve(r.URL.Path, msg)
+		stream, _ := routes.Resolve(r.URL.Path, msg)
 		objectID, streamID, err := p.Pitch(msg, stream)
 		if err != nil {
 			metrics.RecordPitch(metrics.SourceRaw, msg.Severity, metrics.StatusError)
@@ -87,6 +71,19 @@ func NewPitchHandler(p pitcher.Pitcher, router *routing.Router) http.HandlerFunc
 		})
 
 		slog.Info("message pitched", "objectID", objectID, "streamID", streamID)
+	}
+}
+
+// pitchErrorMessage is the response text for a message routing.PreparePitch
+// rejects.
+func pitchErrorMessage(err error) string {
+	switch {
+	case errors.Is(err, routing.ErrPitchTitleRequired):
+		return "Title is required"
+	case errors.Is(err, routing.ErrPitchMessageRequired):
+		return "Message is required"
+	default:
+		return "Invalid message"
 	}
 }
 
