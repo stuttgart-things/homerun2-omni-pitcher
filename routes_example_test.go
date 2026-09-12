@@ -1,4 +1,4 @@
-package routing_test
+package main
 
 import (
 	"os"
@@ -8,8 +8,7 @@ import (
 	"testing"
 
 	homerun "github.com/stuttgart-things/homerun-library/v4"
-
-	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/routing"
+	"github.com/stuttgart-things/homerun-library/v4/routing"
 )
 
 func message(system string) homerun.Message {
@@ -21,7 +20,7 @@ func message(system string) homerun.Message {
 // copies, so it should be held against the parser rather than left to drift:
 // a snippet that no longer validates is worse than no snippet, because it
 // fails at pod start with the process exiting.
-const schemaK = "../../kcl/schema.k"
+const schemaK = "kcl/schema.k"
 
 // example pulls the indented YAML out of the routesConfig doc comment.
 func example(t *testing.T) string {
@@ -57,7 +56,7 @@ func TestTheRoutingExampleInTheBaseIsValid(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	cfg, err := routing.Load(path)
+	cfg, err := loadRoutes(path)
 	if err != nil {
 		t.Fatalf("the example in kcl/schema.k does not load: %v", err)
 	}
@@ -76,16 +75,15 @@ func TestTheRoutingExampleRoutesWhatItClaims(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	cfg, err := routing.Load(path)
+	cfg, err := loadRoutes(path)
 	if err != nil {
 		t.Fatalf("loading the example: %v", err)
 	}
-	router := routing.New(cfg)
 
-	if got := router.Resolve("/pitch", message("tabletennis")); got != "tabletennis" {
+	if got, _ := cfg.Resolve(routing.PitchPath, message("tabletennis")); got != "tabletennis" {
 		t.Errorf("a tabletennis message went to %q, not its own stream", got)
 	}
-	if got := router.Resolve("/pitch", message("github")); got != cfg.DefaultStream {
+	if got, _ := cfg.Resolve(routing.PitchPath, message("github")); got != cfg.DefaultStream {
 		t.Errorf("a github message went to %q, not the default stream %q", got, cfg.DefaultStream)
 	}
 }

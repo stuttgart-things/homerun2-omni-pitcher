@@ -7,8 +7,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/routing"
 	homerun "github.com/stuttgart-things/homerun-library/v4"
+	"github.com/stuttgart-things/homerun-library/v4/routing"
 )
 
 // capturingPitcher records the streamOverride passed to Pitch().
@@ -27,20 +27,20 @@ func (c *capturingPitcher) Pitch(_ homerun.Message, streamOverride ...string) (s
 	return "obj", streamID, nil
 }
 
-func newRouter(t *testing.T) *routing.Router {
+func newRouter(t *testing.T) *routing.StreamRoutes {
 	t.Helper()
-	cfg := &routing.Config{
+	routes := &routing.StreamRoutes{
 		Streams:       []string{"messages", "github-events", "releases"},
 		DefaultStream: "messages",
-		Routes: []routing.Route{
-			{Match: routing.Match{Endpoint: "/pitch/github"}, Stream: "github-events"},
-			{Match: routing.Match{TagContains: "release"}, Stream: "releases"},
+		Routes: []routing.StreamRoute{
+			{Match: routing.RouteMatch{Endpoint: routing.PitchPathGitHub}, Stream: "github-events"},
+			{Match: routing.RouteMatch{TagContains: "release"}, Stream: "releases"},
 		},
 	}
-	if err := cfg.Validate(); err != nil {
-		t.Fatalf("router cfg invalid: %v", err)
+	if err := routes.Validate(); err != nil {
+		t.Fatalf("routes invalid: %v", err)
 	}
-	return routing.New(cfg)
+	return routes
 }
 
 func TestPitchHandlerRoutesByTagMatcher(t *testing.T) {

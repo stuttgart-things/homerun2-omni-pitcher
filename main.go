@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
@@ -16,10 +17,10 @@ import (
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/metrics"
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/middleware"
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/pitcher"
-	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/routing"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	homerun "github.com/stuttgart-things/homerun-library/v4"
+	"github.com/stuttgart-things/homerun-library/v4/routing"
 )
 
 // Build-time variables set via ldflags
@@ -37,20 +38,21 @@ func main() {
 	mode := homerun.GetEnv("PITCHER_MODE", "redis")
 
 	// Optional config-driven stream routing (#105). Unset = legacy single-stream
-	// path: rc.Stream / REDIS_STREAM is used for every message.
-	var router *routing.Router
+	// path: rc.Stream / REDIS_STREAM is used for every message. The parser is
+	// homerun-library routing, which homerun2-config-viewer evaluates too.
+	var routes *routing.StreamRoutes
 	if routesPath := homerun.GetEnv("ROUTES_CONFIG", ""); routesPath != "" {
-		cfg, err := routing.Load(routesPath)
+		var err error
+		routes, err = loadRoutes(routesPath)
 		if err != nil {
 			slog.Error("failed to load routing config", "path", routesPath, "error", err)
 			os.Exit(1)
 		}
-		router = routing.New(cfg)
 		slog.Info("stream routing enabled",
 			"path", routesPath,
-			"streams", router.Streams(),
-			"default_stream", router.DefaultStream(),
-			"routes", len(router.Routes()),
+			"streams", routes.Streams,
+			"default_stream", routes.DefaultStream,
+			"routes", len(routes.Routes),
 		)
 	}
 
@@ -151,11 +153,11 @@ func main() {
 	mux.HandleFunc("/health", handlers.NewHealthHandler(buildInfo))
 	mux.HandleFunc("/ready", handlers.NewReadyHandler(readyCheck))
 	mux.Handle("/metrics", promhttp.Handler())
-	mux.HandleFunc("/pitch", authMiddleware(handlers.NewPitchHandler(p, router)))
-	mux.HandleFunc("/pitch/grafana", authMiddleware(handlers.NewGrafanaPitchHandler(p, router)))
+	mux.HandleFunc(routing.PitchPath, authMiddleware(handlers.NewPitchHandler(p, routes)))
+	mux.HandleFunc(routing.PitchPathGrafana, authMiddleware(handlers.NewGrafanaPitchHandler(p, routes)))
 
 	githubWebhookSecret := homerun.GetEnv("GITHUB_WEBHOOK_SECRET", "")
-	mux.HandleFunc("/pitch/github", authMiddleware(handlers.NewGitHubPitchHandler(p, githubWebhookSecret, router)))
+	mux.HandleFunc(routing.PitchPathGitHub, authMiddleware(handlers.NewGitHubPitchHandler(p, githubWebhookSecret, routes)))
 
 	srv := &http.Server{
 		Addr:    ":" + port,
@@ -195,4 +197,17 @@ func main() {
 	}
 
 	slog.Info("server exited gracefully")
+}
+
+// loadRoutes reads and validates the routing file at path.
+func loadRoutes(path string) (*routing.StreamRoutes, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil, fmt.Errorf("read routes config %s: %w", path, err)
+	}
+	routes, err := routing.ParseStreamRoutes(data)
+	if err != nil {
+		return nil, fmt.Errorf("routes config %s: %w", path, err)
+	}
+	return routes, nil
 }
