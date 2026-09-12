@@ -2,20 +2,20 @@ package models
 
 // GrafanaWebhookPayload represents the JSON body sent by Grafana webhook contact points.
 type GrafanaWebhookPayload struct {
-	Receiver          string              `json:"receiver"`
-	Status            string              `json:"status"`
-	OrgID             int                 `json:"orgId"`
-	Alerts            []GrafanaAlert      `json:"alerts"`
-	GroupLabels       map[string]string   `json:"groupLabels"`
-	CommonLabels      map[string]string   `json:"commonLabels"`
-	CommonAnnotations map[string]string   `json:"commonAnnotations"`
-	ExternalURL       string              `json:"externalURL"`
-	Version           string              `json:"version"`
-	GroupKey          string              `json:"groupKey"`
-	TruncatedAlerts   int                 `json:"truncatedAlerts"`
-	State             string              `json:"state"`
-	Title             string              `json:"title"`
-	Message           string              `json:"message"`
+	Receiver          string            `json:"receiver"`
+	Status            string            `json:"status"`
+	OrgID             int               `json:"orgId"`
+	Alerts            []GrafanaAlert    `json:"alerts"`
+	GroupLabels       map[string]string `json:"groupLabels"`
+	CommonLabels      map[string]string `json:"commonLabels"`
+	CommonAnnotations map[string]string `json:"commonAnnotations"`
+	ExternalURL       string            `json:"externalURL"`
+	Version           string            `json:"version"`
+	GroupKey          string            `json:"groupKey"`
+	TruncatedAlerts   int               `json:"truncatedAlerts"`
+	State             string            `json:"state"`
+	Title             string            `json:"title"`
+	Message           string            `json:"message"`
 }
 
 // GrafanaAlert represents a single alert within a Grafana webhook payload.

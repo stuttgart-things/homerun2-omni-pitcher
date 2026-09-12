@@ -58,8 +58,8 @@ func TestGitHubPitchHandler(t *testing.T) {
 			eventType: "push",
 			payload: models.GitHubWebhookPayload{
 				Ref:    "refs/heads/main",
-				Before: "abc1234567890",
-				After:  "def1234567890",
+				Before: "abc1234567890", // pragma: allowlist secret
+				After:  "def1234567890", // pragma: allowlist secret
 				Pusher: models.GitHubPusher{Name: "developer", Email: "dev@example.com"},
 				Repository: models.GitHubRepository{
 					FullName: "org/repo",
@@ -67,7 +67,7 @@ func TestGitHubPitchHandler(t *testing.T) {
 					Topics:   []string{"go", "microservice"},
 				},
 				Commits: []models.GitHubCommit{
-					{ID: "def1234567890", Message: "feat: add feature\n\nDetailed description"},
+					{ID: "def1234567890", Message: "feat: add feature\n\nDetailed description"}, // pragma: allowlist secret
 				},
 			},
 			pitcher:        &recordingPitcher{},
@@ -230,7 +230,7 @@ func TestGitHubPitchHandler(t *testing.T) {
 }
 
 func TestGitHubSignatureValidation(t *testing.T) {
-	secret := "mysecret"
+	secret := "mysecret" // pragma: allowlist secret
 	rp := &recordingPitcher{}
 
 	payload := models.GitHubWebhookPayload{
@@ -311,8 +311,8 @@ func TestGitHubEventMapping(t *testing.T) {
 		rp := &recordingPitcher{}
 		payload := models.GitHubWebhookPayload{
 			Ref:    "refs/heads/main",
-			Before: "aaa1234567890",
-			After:  "bbb1234567890",
+			Before: "aaa1234567890", // pragma: allowlist secret
+			After:  "bbb1234567890", // pragma: allowlist secret
 			Pusher: models.GitHubPusher{Name: "dev"},
 			Repository: models.GitHubRepository{
 				FullName: "org/repo",
@@ -320,7 +320,7 @@ func TestGitHubEventMapping(t *testing.T) {
 				Topics:   []string{"go"},
 			},
 			Commits: []models.GitHubCommit{
-				{ID: "bbb1234567890", Message: "fix: bug"},
+				{ID: "bbb1234567890", Message: "fix: bug"}, // pragma: allowlist secret
 			},
 		}
 		body, _ := json.Marshal(payload)
@@ -422,7 +422,7 @@ func TestGitHubEventMapping(t *testing.T) {
 }
 
 func TestValidateGitHubSignature(t *testing.T) {
-	secret := "test-secret"
+	secret := "test-secret" // pragma: allowlist secret
 	body := []byte(`{"test": true}`)
 
 	t.Run("valid", func(t *testing.T) {
@@ -463,7 +463,7 @@ func TestHelperFunctions(t *testing.T) {
 	})
 
 	t.Run("shortSHA", func(t *testing.T) {
-		if got := shortSHA("abc1234567890"); got != "abc1234" {
+		if got := shortSHA("abc1234567890"); got != "abc1234" { // pragma: allowlist secret
 			t.Errorf("expected 'abc1234', got '%s'", got)
 		}
 		if got := shortSHA("short"); got != "short" {

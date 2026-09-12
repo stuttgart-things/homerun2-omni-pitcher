@@ -8,9 +8,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	homerun "github.com/stuttgart-things/homerun-library/v4"
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/models"
 	"github.com/stuttgart-things/homerun2-omni-pitcher/internal/pitcher"
-	homerun "github.com/stuttgart-things/homerun-library/v4"
 )
 
 // mockPitcher is a test pitcher that returns configurable results.
