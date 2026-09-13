@@ -1,3 +1,10 @@
+# [2.3.0](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v2.2.1...v2.3.0) (2026-09-13)
+
+
+### Features
+
+* mark a resolved alert as success and say so in its message ([638bef6](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/638bef6cfdda51f6f5c790b7248fcade7898ba79)), closes [#193](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/193)
+
 ## [2.2.1](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v2.2.0...v2.2.1) (2026-09-13)
 
 
