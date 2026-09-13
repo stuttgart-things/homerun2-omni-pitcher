@@ -95,6 +95,10 @@ func NewGrafanaPitchHandler(p pitcher.Pitcher, routes *routing.StreamRoutes) htt
 	}
 }
 
+// resolvedPrefix opens the message of a resolved alert, so the text says it
+// in any sink, whatever that sink does with the severity.
+const resolvedPrefix = "Resolved: "
+
 // grafanaAlertToMessage maps a Grafana alert to a homerun.Message.
 func grafanaAlertToMessage(alert models.GrafanaAlert, payload models.GrafanaWebhookPayload) homerun.Message {
 	// Build title from alert labels (alertname is the convention)
@@ -124,7 +128,18 @@ func grafanaAlertToMessage(alert models.GrafanaAlert, payload models.GrafanaWebh
 	case "firing":
 		severity = mapGrafanaSeverity(alert.Labels["severity"])
 	case "resolved":
-		severity = "info"
+		// "success", not "info": a resolution is good news, and a sink has to
+		// be able to route it on its own. homerun2-notification-catcher ranks
+		// success between info and warning and renders it green, so an output
+		// can pick resolutions up without lowering a warning floor that would
+		// let every info message through as well.
+		severity = "success"
+	}
+
+	// The summary annotation describes the problem ("… does not answer"), so
+	// without a marker a resolution reads exactly like the alert it resolves.
+	if alert.Status == "resolved" && !strings.HasPrefix(message, resolvedPrefix) {
+		message = resolvedPrefix + message
 	}
 
 	// Use startsAt as timestamp, fall back to now

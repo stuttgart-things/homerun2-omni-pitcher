@@ -214,7 +214,7 @@ func TestGrafanaAlertToMessage(t *testing.T) {
 		}
 	})
 
-	t.Run("resolved alert gets info severity", func(t *testing.T) {
+	t.Run("resolved alert gets success severity and says so", func(t *testing.T) {
 		alert := models.GrafanaAlert{
 			Status:      "resolved",
 			Labels:      map[string]string{"alertname": "HighCPU", "severity": "critical"},
@@ -223,8 +223,14 @@ func TestGrafanaAlertToMessage(t *testing.T) {
 
 		msg := grafanaAlertToMessage(alert, payload)
 
-		if msg.Severity != "info" {
-			t.Errorf("expected severity 'info' for resolved alert, got '%s'", msg.Severity)
+		if msg.Severity != "success" {
+			t.Errorf("expected severity 'success' for resolved alert, got '%s'", msg.Severity)
+		}
+		if msg.Message != "Resolved: All good now" {
+			t.Errorf("expected the message to say it is resolved, got '%s'", msg.Message)
+		}
+		if msg.Title != "HighCPU" {
+			t.Errorf("expected the title to stay the alertname, got '%s'", msg.Title)
 		}
 	})
 
