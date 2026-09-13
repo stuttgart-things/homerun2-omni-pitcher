@@ -1,3 +1,10 @@
+## [2.2.1](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v2.2.0...v2.2.1) (2026-09-13)
+
+
+### Bug Fixes
+
+* **deps:** update module github.com/micahparks/keyfunc/v3 to v3.8.2 ([#178](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/178)) ([9face18](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/9face188ca5ffa3a6feffd1e469f64677ae67664))
+
 # [2.2.0](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v2.1.4...v2.2.0) (2026-09-12)
 
 
