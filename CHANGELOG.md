@@ -1,3 +1,10 @@
+## [2.3.2](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v2.3.1...v2.3.2) (2026-09-20)
+
+
+### Bug Fixes
+
+* **ci:** baue das PR-Image aus dem Head-Commit ([a0c4727](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/a0c4727bb4831961a3ca2e7bff5928aa4b3a8010)), closes [#198](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/198)
+
 ## [2.3.1](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v2.3.0...v2.3.1) (2026-09-20)
 
 
