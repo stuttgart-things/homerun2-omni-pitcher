@@ -1,3 +1,10 @@
+## [2.3.1](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v2.3.0...v2.3.1) (2026-09-20)
+
+
+### Bug Fixes
+
+* **ci:** repariere die PR-Preview-Strecke ([de73793](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/de73793a95f35ad5f13162f53745c9f651c0603e)), closes [stuttgart-things/stuttgart-things#3065](https://github.com/stuttgart-things/stuttgart-things/issues/3065) [#196](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/196)
+
 # [2.3.0](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v2.2.1...v2.3.0) (2026-09-13)
 
 
