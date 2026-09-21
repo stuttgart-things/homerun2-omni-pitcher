@@ -1,3 +1,10 @@
+## [2.3.3](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v2.3.2...v2.3.3) (2026-09-21)
+
+
+### Bug Fixes
+
+* **ci:** nimm die Preview-Domain aus der Org-Variable ([370fe31](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/370fe317514997b60f9df5fb7d596ec3bdd71e25)), closes [#200](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/200)
+
 ## [2.3.2](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v2.3.1...v2.3.2) (2026-09-20)
 
 
