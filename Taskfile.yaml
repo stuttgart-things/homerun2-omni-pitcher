@@ -436,5 +436,5 @@ tasks:
         run-test-with-redis \
         --source {{ .SOURCE_CODE_DIR }} \
         --test-path=. \
-        --go-Version=1.26.6 \
+        --go-Version=1.26.10 \
         --progress plain -vv
