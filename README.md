@@ -13,6 +13,7 @@ A Go HTTP microservice that accepts JSON messages via `POST /pitch` and enqueues
 | `/metrics` | `GET` | None | Prometheus exposition (counters/histograms partitioned by source + severity, Go runtime metrics) |
 | `/pitch` | `POST` | Bearer token or JWT | Submit a message to Redis Streams or file |
 | `/pitch/grafana` | `POST` | Bearer token or JWT | Accept Grafana webhook alerts and enqueue as messages |
+| `/pitch/alertmanager` | `POST` | Bearer token or JWT | Accept Alertmanager webhook alerts (v4 payload) and enqueue as messages |
 | `/pitch/github` | `POST` | Bearer token or JWT | Accept GitHub webhook events and enqueue as messages |
 
 <details>
@@ -105,6 +106,49 @@ Response:
   "errors": []
 }
 ```
+
+</details>
+
+<details>
+<summary><b>Pitch from Alertmanager</b></summary>
+
+Add a [webhook receiver](https://prometheus.io/docs/alerting/latest/configuration/#webhook_config) that points at `/pitch/alertmanager`:
+
+```yaml
+receivers:
+  - name: msteams
+    webhook_configs:
+      - url: https://<pitcher-host>/pitch/alertmanager   # ?group=true: one message per group
+        send_resolved: true
+        http_config:
+          authorization:
+            credentials: <YOUR_AUTH_TOKEN>
+```
+
+Each alert in the payload is mapped to a `homerun.Message`:
+
+| Alertmanager field | Message field |
+|---|---|
+| `labels.alertname` | `title` |
+| `annotations.summary` / `description`, then `commonAnnotations` | `message` (`Resolved: ` prefixed when resolved) |
+| `labels.severity` (`critical`/`page`, `warning`, `info`); `success` when resolved | `severity` |
+| `startsAt`; `endsAt` when resolved | `timestamp` |
+| `receiver` | `system` |
+| `generatorURL`, else `externalURL` | `url` |
+| `status`, `fingerprint`, remaining labels (sorted) | `tags`: `status=firing\|resolved,fingerprint=<fp>,<label>=<value>,…` |
+
+`author` is `alertmanager`. The `status` and `fingerprint` tags let a consumer
+tell a resolution from its alert and pair the two (the notification-catcher's
+cards, homerun2-notification-catcher#71). A comma in a label value becomes `;`,
+so it cannot split the tags.
+
+`?group=true` pitches one message per notification group instead: the common
+labels and annotations, the highest severity of the firing alerts, `success`
+when the group is resolved, and the tags `status=…,alerts=<n>`.
+
+The response has the same shape as `/pitch/grafana`'s. A stream routing rule
+for it needs `endpoint: /pitch/alertmanager`: a rule on `/pitch/grafana` does
+not match it.
 
 </details>
 

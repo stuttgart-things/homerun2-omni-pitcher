@@ -17,6 +17,8 @@ const (
 	SourceRaw     = "raw"
 	SourceGrafana = "grafana"
 	SourceGitHub  = "github"
+	// SourceAlertmanager is /pitch/alertmanager (#210).
+	SourceAlertmanager = "alertmanager"
 )
 
 // Status labels for omni_pitcher_pitches_total.

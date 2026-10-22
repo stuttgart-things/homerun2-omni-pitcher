@@ -30,6 +30,12 @@ routes:
       endpoint: /pitch/grafana
     stream: alerts
 
+  # Alertmanager's native payload (#210). Its own rule: endpoint is a
+  # substring test, so the /pitch/grafana rule above does not match it.
+  - match:
+      endpoint: /pitch/alertmanager
+    stream: alerts
+
   # Legacy Grafana-only path — kept for setups that don't run
   # notification-catcher. Payload sets Message.System = receiver name.
   - match:

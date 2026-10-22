@@ -50,7 +50,7 @@ homerun2-omni-pitcher — Go HTTP microservice that accepts JSON messages via `P
 ## Key Paths
 
 - `main.go` — entrypoint, routing, graceful shutdown
-- `internal/handlers/` — HTTP handlers (pitch, health)
+- `internal/handlers/` — HTTP handlers (pitch, health, `/pitch/grafana`, `/pitch/github`, `/pitch/alertmanager` in `alertmanager.go`: Alertmanager v4 payload, per alert or `?group=true`, tags `status=firing|resolved` + `fingerprint=`, #210)
 - `internal/middleware/` — auth middleware
 - `internal/config/` — env-based config loading
 - `internal/models/` — response structs
