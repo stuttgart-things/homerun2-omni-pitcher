@@ -1,3 +1,15 @@
+# [2.4.0](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v2.3.3...v2.4.0) (2026-10-22)
+
+
+### Bug Fixes
+
+* **deps:** build with go1.26.10 ([c631ffb](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/c631ffb07c8e7bca5671bdf3f1b581906cf90129))
+
+
+### Features
+
+* dedicated /pitch/alertmanager endpoint ([1a99ff1](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/1a99ff161c471f55814d8a8d24a0707bb5cce860)), closes [homerun2-notification-catcher#71](https://github.com/homerun2-notification-catcher/issues/71) [#210](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/210)
+
 ## [2.3.3](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v2.3.2...v2.3.3) (2026-09-21)
 
 
