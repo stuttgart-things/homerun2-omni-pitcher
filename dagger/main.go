@@ -38,7 +38,7 @@ func (m *Dagger) Govulncheck(
 	ctx context.Context,
 	src *dagger.Directory,
 	// +optional
-	// +default="1.26.6"
+	// +default="1.26.10"
 	goVersion string,
 	// +optional
 	// +default="latest"
@@ -84,7 +84,7 @@ func (m *Dagger) Test(
 	ctx context.Context,
 	src *dagger.Directory,
 	// +optional
-	// +default="1.26.6"
+	// +default="1.26.10"
 	goVersion string,
 	// +optional
 	// +default="./..."
@@ -120,7 +120,7 @@ func (m *Dagger) Build(
 	// +default=""
 	ldflags string,
 	// +optional
-	// +default="1.26.6"
+	// +default="1.26.10"
 	goVersion string,
 	// +optional
 	// +default="linux"
@@ -174,7 +174,7 @@ func (m *Dagger) BuildAndTestBinary(
 	ctx context.Context,
 	source *dagger.Directory,
 	// +optional
-	// +default="1.26.6"
+	// +default="1.26.10"
 	goVersion string,
 	// +optional
 	// +default="linux"

@@ -105,6 +105,39 @@ If all alerts fail, the endpoint returns `503`:
 }
 ```
 
+## POST /pitch/alertmanager
+
+Accept Alertmanager's native webhook payload (version 4) and enqueue each alert as a message.
+
+### Request
+
+Point a [webhook receiver](https://prometheus.io/docs/alerting/latest/configuration/#webhook_config) at `https://<pitcher-host>/pitch/alertmanager`, with `send_resolved: true` and the token as `http_config.authorization.credentials`. A payload with another `version` than `4` is rejected with `400`, one without alerts as well.
+
+| Alertmanager field | Message field |
+|---|---|
+| `labels.alertname` | `title` |
+| `annotations.summary` / `description`, then `commonAnnotations` | `message` (`Resolved: ` prefixed when resolved) |
+| `labels.severity` (`critical`/`page`, `warning`, `info`); `success` when resolved | `severity` |
+| `startsAt`; `endsAt` when resolved | `timestamp` |
+| `receiver` | `system` |
+| `generatorURL`, else `externalURL` | `url` |
+| `status`, `fingerprint`, remaining labels (sorted) | `tags`: `status=firing\|resolved,fingerprint=<fp>,<label>=<value>,…` |
+
+`author` is `alertmanager`. The `status` and `fingerprint` tags let a consumer
+tell a resolution from its alert and pair the two (the notification-catcher's
+cards, homerun2-notification-catcher#71). A comma in a label value becomes `;`,
+so it cannot split the tags.
+
+`?group=true` pitches one message per notification group instead: the common
+labels and annotations, the highest severity of the firing alerts, `success`
+when the group is resolved, and the tags `status=…,alerts=<n>`.
+
+### Response
+
+Same as `/pitch/grafana`: `200` with `results` (and `errors` on a partial failure), `503` when no alert could be enqueued.
+
+A routing rule needs `endpoint: /pitch/alertmanager`; a rule on `/pitch/grafana` does not match it.
+
 ## POST /pitch/github
 
 Accept GitHub webhook payloads and enqueue each event as a message.

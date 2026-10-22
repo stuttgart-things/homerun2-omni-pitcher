@@ -155,6 +155,7 @@ func main() {
 	mux.Handle("/metrics", promhttp.Handler())
 	mux.HandleFunc(routing.PitchPath, authMiddleware(handlers.NewPitchHandler(p, routes)))
 	mux.HandleFunc(routing.PitchPathGrafana, authMiddleware(handlers.NewGrafanaPitchHandler(p, routes)))
+	mux.HandleFunc(handlers.PitchPathAlertmanager, authMiddleware(handlers.NewAlertmanagerPitchHandler(p, routes)))
 
 	githubWebhookSecret := homerun.GetEnv("GITHUB_WEBHOOK_SECRET", "")
 	mux.HandleFunc(routing.PitchPathGitHub, authMiddleware(handlers.NewGitHubPitchHandler(p, githubWebhookSecret, routes)))
