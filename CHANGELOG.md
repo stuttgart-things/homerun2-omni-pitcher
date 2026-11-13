@@ -1,3 +1,10 @@
+## [2.4.1](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v2.4.0...v2.4.1) (2026-11-13)
+
+
+### Bug Fixes
+
+* **deps:** release homerun-library v4.6.0 so /pitch keeps the payload ([#216](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/216)) ([d4f8482](https://github.com/stuttgart-things/homerun2-omni-pitcher/commit/d4f8482b0afdc720f6283edf1fc797082b472ba2)), closes [#215](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/215) [#214](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/214)
+
 # [2.4.0](https://github.com/stuttgart-things/homerun2-omni-pitcher/compare/v2.3.3...v2.4.0) (2026-10-22)
 
 
