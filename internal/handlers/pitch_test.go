@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	homerun "github.com/stuttgart-things/homerun-library/v4"
@@ -219,5 +220,32 @@ func TestRespondWithJSON(t *testing.T) {
 
 	if response.ObjectID != "test-id" {
 		t.Errorf("expected objectID 'test-id', got '%s'", response.ObjectID)
+	}
+}
+
+// capturePitcher records the message it was asked to pitch.
+type capturePitcher struct{ got homerun.Message }
+
+func (c *capturePitcher) Pitch(msg homerun.Message, _ ...string) (string, string, error) {
+	c.got = msg
+	return "obj", "stream", nil
+}
+
+// /pitch hands the message payload (homerun-library v4.6) on unchanged, so a
+// pitcher that sends a structured object (k8s-pitcher includeObject) gets it
+// into the Redis document.
+func TestPitchHandlerKeepsPayload(t *testing.T) {
+	p := &capturePitcher{}
+	body := `{"title":"Pod default/web-0: 1 finding","message":"m","payload":{"kind":"Result","spec":{"error":[{"text":"back-off"}]}}}`
+	req := httptest.NewRequest(http.MethodPost, "/pitch", strings.NewReader(body))
+	rec := httptest.NewRecorder()
+
+	NewPitchHandler(p, nil)(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("status %d: %s", rec.Code, rec.Body.String())
+	}
+	if want := `{"kind":"Result","spec":{"error":[{"text":"back-off"}]}}`; string(p.got.Payload) != want {
+		t.Errorf("payload = %s, want %s", p.got.Payload, want)
 	}
 }
