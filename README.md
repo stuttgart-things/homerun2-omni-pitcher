@@ -66,6 +66,7 @@ Response:
 | `assigneename` | No | Name of the assignee | - |
 | `artifacts` | No | Related artifacts (e.g., container image) | - |
 | `url` | No | Related URL | - |
+| `payload` | No | Structured source object as JSON (e.g. a Kubernetes object), stored as nested JSON in the Redis document, at most 256 KiB. Requires homerun-library ≥ v4.6.0 (#214) | - |
 
 </details>
 
